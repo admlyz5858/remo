@@ -18,7 +18,7 @@ function extractJSON(text) {
   return JSON.parse(text.slice(start, end + 1));
 }
 
-async function detectSubject({ apiKey, imageBase64, narration, query, fetchImpl = fetch, model = "gemini-2.0-flash" }) {
+async function detectSubject({ apiKey, imageBase64, narration, query, fetchImpl = fetch, model = "gemini-flash-latest" }) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   const prompt = `Narration: "${narration}". Find the main subject described as "${query}" in this image. Respond ONLY JSON: {"box":{"x":CENTER_X,"y":CENTER_Y,"w":WIDTH,"h":HEIGHT},"label":"2-3 words"} with normalized 0-1 coordinates (x,y = center). If unclear use {"box":{"x":0.5,"y":0.45,"w":0,"h":0},"label":""}.`;
   const body = {

@@ -11,5 +11,5 @@ module.exports = {
   mediaOrder: ["pexelsVideo", "pixabayVideo", "pixabayPhoto", "unsplash"],
   music: { dir: "remotion/public/music", volume: 0.1 },
   sfx: { dir: "remotion/public/sfx" },
-  visionModel: "gemini-2.0-flash",
+  visionModel: "gemini-flash-latest",
 };
