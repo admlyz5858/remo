@@ -1,11 +1,12 @@
 const { readJSON, writeJSON, runPath } = require("./lib/fsx");
 
-const SYSTEM = `You curate a YouTube Shorts "funniest Reddit answers" video.
-Given a question and raw comments, pick the 5-8 FUNNIEST, SAFE, self-contained comments.
+const SYSTEM = `You curate a YouTube Shorts "funniest comments" video.
+Given a source title/question and raw comments, pick the 5-8 FUNNIEST, SAFE, self-contained comments.
 HARD rules: NO slurs, NO NSFW/sexual, NO hate, NO personal info, NO links. Lightly clean typos/markdown; keep each comment under ~200 chars.
 Respond ONLY JSON: {question, comments:[{id, author, text, upvotes}], title, description, tags}.
-- Keep the question concise. author like "u/name". upvotes a human string like "12.4k".
-- title <= 90 chars ending with " #shorts". tags 10-20 incl "reddit","askreddit","shorts".`;
+- question: a SHORT punchy on-screen intro line (e.g. "The funniest comments on this 😂"), not the raw long title.
+- author like "u/name" or a display name. upvotes a human string like "12.4k".
+- title <= 90 chars ending with " #shorts". tags 10-20 incl "comments","funny","shorts".`;
 
 async function curateDeck({ runId, runRoot, chat }) {
   const raw = readJSON(runPath(runRoot, runId, "raw_deck.json"));

@@ -30,12 +30,12 @@ async function main() {
     const { makeCommentsVoiceover } = require("./03c-voiceover-comments");
     const { fetchBackground } = require("./05b-background");
     const { renderComments } = require("./06-render");
-    const { fetchTopPost, fetchComments } = require("./lib/reddit");
     const { findMediaCandidates } = require("./lib/stock");
-    const ua = process.env.REDDIT_USER_AGENT || "remo-bot/1.0 (by /u/remo)";
-    await fetchRawDeck({ runId, runRoot, seed: runId, subreddits: cfg.subreddits, deps: {
-      getPost: (sub) => fetchTopPost(sub, { userAgent: ua }),
-      getComments: (sub, id) => fetchComments(sub, id, { userAgent: ua }),
+    const { getPopularVideo, fetchTopComments } = require("./lib/ytcomments");
+    const ytKey = process.env.YOUTUBE_API_KEY;
+    await fetchRawDeck({ runId, runRoot, seed: runId, subreddits: ["youtube"], deps: {
+      getPost: async () => { const v = await getPopularVideo({ apiKey: ytKey, seed: runId }); return { id: v.id, subreddit: "💬 Funniest Comments", title: v.title }; },
+      getComments: async (_sub, id) => fetchTopComments(id, { apiKey: ytKey, max: 60 }),
     }});
     await curateDeck({ runId, runRoot, chat });
     const voDeps = { synth: sh.synth, probeDuration: sh.probeDuration, concat: sh.concat };
