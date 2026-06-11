@@ -9,12 +9,13 @@ import { HookCard } from "./components/HookCard";
 import { WaitBadge } from "./components/WaitBadge";
 import { EndCard } from "./components/EndCard";
 import { EmojiPop } from "./components/EmojiPop";
+import { Annotation } from "./components/Annotation";
 import { ProgressBar } from "./components/ProgressBar";
 import type { ShortProps } from "./schema";
 
 const { fontFamily } = loadFont();
 
-export const Short: React.FC<ShortProps> = ({ audioSrc, musicSrc, musicVolume, theme, captions, scenes, hookQuestion, waitTeaser, payoff, cta }) => {
+export const Short: React.FC<ShortProps> = ({ audioSrc, musicSrc, musicVolume, theme, captions, scenes, hookQuestion, waitTeaser, payoff, cta, sfxSrc }) => {
   const ff = theme.fontFamily === "Anton" ? fontFamily : theme.fontFamily;
   const accent = theme.accentColor;
   const last = scenes[scenes.length - 1];
@@ -29,6 +30,8 @@ export const Short: React.FC<ShortProps> = ({ audioSrc, musicSrc, musicVolume, t
           <Scene scene={scene} accentColor={accent} />
           {scene.onScreenText ? <OnScreenText text={scene.onScreenText} fontFamily={ff} accentColor={accent} /> : null}
           {scene.emoji ? <EmojiPop emoji={scene.emoji} /> : null}
+          {scene.annotation ? <Annotation annotation={scene.annotation} /> : null}
+          {scene.annotation && sfxSrc ? <Audio src={staticFile(sfxSrc)} /> : null}
         </Sequence>
       ))}
       {scenes[0] && hookQuestion ? (
