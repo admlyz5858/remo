@@ -1,0 +1,13 @@
+{
+  "name": "remo",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test pipeline/**/*.test.js",
+    "lint": "tsc -p remotion --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.0",
+    "@remotion/renderer": "^4.0.0"
+  }
+}
