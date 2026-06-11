@@ -1,37 +1,16 @@
-const fs = require("node:fs");
-const path = require("node:path");
 const { readJSON, writeJSON, runPath } = require("./lib/fsx");
-const { applyTimings, assembleCaptions } = require("./lib/timeline");
+const { synthSegments } = require("./lib/voiceover-core");
 
 async function makeVoiceover({ runId, runRoot, voice, rate, deps }) {
   const scenesPath = runPath(runRoot, runId, "scenes.json");
   const doc = readJSON(scenesPath);
   const audioDir = runPath(runRoot, runId, "audio");
-  fs.mkdirSync(audioDir, { recursive: true });
-
-  const sceneFiles = [];
-  const durations = [];
-  const perSceneWords = [];
-  for (const s of doc.scenes) {
-    const out = path.join(audioDir, `scene_${String(s.id).padStart(2, "0")}.mp3`);
-    const words = await deps.synth(s.narration, out, voice, rate);
-    perSceneWords.push(words || []);
-    durations.push(await deps.probeDuration(out));
-    sceneFiles.push(out);
-  }
-  const finalOut = path.join(audioDir, "voiceover.mp3");
-  await deps.concat(sceneFiles, finalOut);
-
-  const timed = applyTimings(doc.scenes, durations);
-  doc.scenes = timed.scenes;
+  const segments = doc.scenes.map((s) => ({ id: s.id, narration: s.narration }));
+  const { timed, captions } = await synthSegments({ segments, audioDir, voice, rate, deps });
+  doc.scenes = doc.scenes.map((s, i) => ({ ...s, duration_sec: timed.scenes[i].duration_sec, audio_start_ms: timed.scenes[i].audio_start_ms, audio_end_ms: timed.scenes[i].audio_end_ms }));
   doc.total_duration_sec = timed.total_duration_sec;
   writeJSON(scenesPath, doc);
-
-  // Captions come straight from edge-tts word boundaries (no Whisper needed).
-  const startsMs = timed.scenes.map((s) => s.audio_start_ms);
-  const captions = assembleCaptions(perSceneWords, startsMs);
   writeJSON(runPath(runRoot, runId, "captions.json"), captions);
-
   return doc;
 }
 module.exports = { makeVoiceover };

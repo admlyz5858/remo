@@ -12,4 +12,8 @@ module.exports = {
   music: { dir: "remotion/public/music", volume: 0.1 },
   sfx: { dir: "remotion/public/sfx" },
   visionModel: "gemini-flash-latest",
+  mode: process.env.MODE || "facts",
+  subreddits: ["AskReddit", "Showerthoughts", "AskReddit", "tifu"],
+  gameplay: { dir: "remotion/public/gameplay" },
+  commentsTokenEnv: "YT_COMMENTS_REFRESH_TOKEN",
 };

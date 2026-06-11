@@ -62,4 +62,30 @@ function assembleCaptions(perScene, startsMs) {
   });
   return caps;
 }
-module.exports = { applyTimings, buildInputProps, assembleCaptions };
+function parseUpvotes(s) {
+  if (!s) return 0;
+  const m = String(s).trim().toLowerCase().match(/^([\d.]+)\s*([km]?)$/);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  return Math.round(n * (m[2] === "k" ? 1e3 : m[2] === "m" ? 1e6 : 1));
+}
+
+function buildCommentsProps({ runId, deck, captions, theme, fps, seed, accentPalette, musicSrc, musicVolume, sfxSrc, backgroundSrc }) {
+  const accentColor = pickFrom(seed, accentPalette);
+  let frame = 0;
+  const segments = deck.segments.map((s) => {
+    const durationFrames = Math.round(s.duration_sec * fps);
+    const node = { kind: s.kind, author: s.author || null, upvotes: s.upvotes || null, text: s.text, startFrame: frame, durationFrames };
+    frame += durationFrames;
+    return node;
+  });
+  return {
+    fps, width: 1080, height: 1920,
+    audioSrc: `${runId}/voiceover.mp3`,
+    musicSrc: musicSrc || null, musicVolume, sfxSrc: sfxSrc || null,
+    backgroundSrc, subreddit: deck.subreddit, question: deck.question,
+    theme: { ...theme, accentColor }, captions, segments,
+  };
+}
+
+module.exports = { applyTimings, buildInputProps, assembleCaptions, buildCommentsProps, parseUpvotes };

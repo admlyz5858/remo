@@ -22,3 +22,10 @@ test("config has sfx dir + vision model", () => {
   assert.strictEqual(cfg.sfx.dir, "remotion/public/sfx");
   assert.ok(typeof cfg.visionModel === "string" && cfg.visionModel.length > 0);
 });
+
+test("config has mode + comments settings", () => {
+  assert.strictEqual(cfg.mode, "facts");
+  assert.ok(Array.isArray(cfg.subreddits) && cfg.subreddits.length >= 1);
+  assert.strictEqual(cfg.gameplay.dir, "remotion/public/gameplay");
+  assert.strictEqual(cfg.commentsTokenEnv, "YT_COMMENTS_REFRESH_TOKEN");
+});

@@ -24,6 +24,35 @@ async function main() {
   const history = fs.existsSync(historyPath) ? readJSON(historyPath) : { entries: [] };
   const chat = (args) => chatJSON({ apiKey: process.env.OPENROUTER_API_KEY, model: cfg.model, ...args });
 
+  if (cfg.mode === "comments") {
+    const { fetchRawDeck } = require("./01c-comments");
+    const { curateDeck } = require("./02c-curate");
+    const { makeCommentsVoiceover } = require("./03c-voiceover-comments");
+    const { fetchBackground } = require("./05b-background");
+    const { renderComments } = require("./06-render");
+    const { fetchTopPost, fetchComments } = require("./lib/reddit");
+    const { findMediaCandidates } = require("./lib/stock");
+    const ua = process.env.REDDIT_USER_AGENT || "remo-bot/1.0 (by /u/remo)";
+    await fetchRawDeck({ runId, runRoot, seed: runId, subreddits: cfg.subreddits, deps: {
+      getPost: (sub) => fetchTopPost(sub, { userAgent: ua }),
+      getComments: (sub, id) => fetchComments(sub, id, { userAgent: ua }),
+    }});
+    await curateDeck({ runId, runRoot, chat });
+    const voDeps = { synth: sh.synth, probeDuration: sh.probeDuration, concat: sh.concat };
+    await makeCommentsVoiceover({ runId, runRoot, voice: cfg.voice, rate: cfg.ttsRate, deps: voDeps });
+    const bgFind = async (q) => (await findMediaCandidates(q, ["pexelsVideo", "pixabayVideo"], {
+      pexelsVideo: (x) => providers.pexelsVideoCandidates(x, { apiKey: process.env.PEXELS_API_KEY }),
+      pixabayVideo: (x) => providers.pixabayVideoCandidates(x, { apiKey: process.env.PIXABAY_API_KEY }),
+    }))[0] || null;
+    await fetchBackground({ runId, pubRoot: "remotion/public", seed: runId, gameplayDir: cfg.gameplay.dir, find: bgFind, download });
+    const outFile = `out/${runId}.mp4`;
+    await renderComments({ runId, runRoot, pubRoot: "remotion/public", theme: cfg.theme, fps: cfg.render.fps, outFile });
+    const nextHistory = addEntry(history, { mode: "comments", slug: `reddit-${runId}`, topic: "reddit", status: "pending", runId });
+    writeJSON(historyPath, nextHistory);
+    console.log(JSON.stringify({ runId, mode: "comments", outFile }));
+    return;
+  }
+
   let topic;
   for (let attempt = 0; attempt < 3; attempt++) {
     topic = await pickTopic({ runId, runRoot, history, chat });

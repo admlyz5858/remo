@@ -1,6 +1,11 @@
 name: produce
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "facts or comments"
+        required: false
+        default: "facts"
 
 permissions:
   contents: write
@@ -29,6 +34,9 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MODE: ${{ inputs.mode }}
+          REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: node pipeline/run.js
       - name: Capture run id
         id: runid
@@ -43,12 +51,15 @@ jobs:
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YT_COMMENTS_REFRESH_TOKEN: ${{ secrets.YT_COMMENTS_REFRESH_TOKEN }}
         run: |
           ID=${{ steps.runid.outputs.id }}
+          if [ "${{ inputs.mode }}" = "comments" ]; then RT=YT_COMMENTS_REFRESH_TOKEN; else RT=YOUTUBE_REFRESH_TOKEN; fi
           python scripts/upload_youtube.py upload \
             --video out/$ID.mp4 \
             --meta run/$ID/meta.json \
             --privacy private \
+            --refresh-token-env $RT \
             --out run/$ID/upload.json
           cat run/$ID/upload.json
       - name: Persist upload result + history
