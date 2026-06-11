@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { applyTimings, buildInputProps } = require("./timeline");
+const { applyTimings, buildInputProps, assembleCaptions } = require("./timeline");
 
 test("applyTimings sets cumulative ms windows and total", () => {
   const scenes = [{ id: 1 }, { id: 2 }];
@@ -30,4 +30,17 @@ test("buildInputProps converts seconds to frames and wires media", () => {
   assert.strictEqual(props.scenes[0].media.src, "r1/scene_01.mp4");
   assert.strictEqual(props.audioSrc, "r1/voiceover.mp3");
   assert.strictEqual(props.scenes[0].onScreenText, "A");
+});
+
+test("assembleCaptions offsets per-scene word boundaries by scene start", () => {
+  const perScene = [
+    [{ text: "one", offsetMs: 0, durationMs: 400 }, { text: "two", offsetMs: 400, durationMs: 600 }],
+    [{ text: "three", offsetMs: 0, durationMs: 500 }],
+  ];
+  const startsMs = [0, 2000];
+  const caps = assembleCaptions(perScene, startsMs);
+  assert.strictEqual(caps.length, 3);
+  assert.deepStrictEqual(caps[0], { text: "one", startMs: 0, endMs: 400, timestampMs: 200, confidence: 1 });
+  assert.deepStrictEqual(caps[1], { text: "two", startMs: 400, endMs: 1000, timestampMs: 700, confidence: 1 });
+  assert.deepStrictEqual(caps[2], { text: "three", startMs: 2000, endMs: 2500, timestampMs: 2250, confidence: 1 });
 });

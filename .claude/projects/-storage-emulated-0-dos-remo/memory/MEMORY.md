@@ -1,0 +1,1 @@
+- [remo Shorts Factory](remo-shorts-factory.md) — English fun-facts Shorts pipeline; independent from otomasyon; Remotion renders only on CI (Termux FAT can't npm install)

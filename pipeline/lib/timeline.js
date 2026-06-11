@@ -27,4 +27,19 @@ function buildInputProps({ runId, scenesDoc, media, captions, theme, fps }) {
   });
   return { fps, width: 1080, height: 1920, audioSrc: `${runId}/voiceover.mp3`, theme, captions, scenes };
 }
-module.exports = { applyTimings, buildInputProps };
+// Build @remotion/captions Caption[] from per-scene edge-tts word boundaries.
+// perScene[i] = [{ text, offsetMs, durationMs }] relative to that scene's audio.
+// startsMs[i] = absolute audio_start_ms of scene i (from applyTimings).
+function assembleCaptions(perScene, startsMs) {
+  const caps = [];
+  perScene.forEach((words, i) => {
+    const base = startsMs[i];
+    for (const w of words) {
+      const startMs = Math.round(base + w.offsetMs);
+      const endMs = Math.round(base + w.offsetMs + w.durationMs);
+      caps.push({ text: w.text, startMs, endMs, timestampMs: Math.round((startMs + endMs) / 2), confidence: 1 });
+    }
+  });
+  return caps;
+}
+module.exports = { applyTimings, buildInputProps, assembleCaptions };

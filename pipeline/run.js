@@ -6,7 +6,6 @@ const { chatJSON } = require("./lib/openrouter");
 const { pickTopic } = require("./01-topic");
 const { writeScript } = require("./02-script");
 const { makeVoiceover } = require("./03-voiceover");
-const { makeCaptions } = require("./04-captions");
 const { fetchSceneMedia } = require("./05-media");
 const { render } = require("./06-render");
 const sh = require("./lib/sh");
@@ -35,11 +34,9 @@ async function main() {
 
   await writeScript({ runId, runRoot, topic, chat });
 
+  // Voiceover also emits captions.json from edge-tts word boundaries.
   const voDeps = { synth: sh.synth, probeDuration: sh.probeDuration, concat: sh.concat };
   await makeVoiceover({ runId, runRoot, voice: cfg.voice, rate: cfg.ttsRate, deps: voDeps });
-
-  const transcribe = (audio, out) => sh.run("python", ["scripts/transcribe.py", "--audio", audio, "--out", out, "--lang", "en"]);
-  await makeCaptions({ runId, runRoot, transcribe });
 
   const provFns = {
     pexels: (q) => providers.pexels(q, { apiKey: process.env.PEXELS_API_KEY }),

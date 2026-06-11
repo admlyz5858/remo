@@ -9,7 +9,9 @@ function run(cmd, args) {
   });
 }
 async function synth(text, out, voice, rate) {
-  await run("python", ["scripts/tts.py", "--text", text, "--voice", voice, "--rate", rate, "--out", out]);
+  const boundaries = out + ".words.json";
+  await run("python", ["scripts/tts.py", "--text", text, "--voice", voice, "--rate", rate, "--out", out, "--boundaries", boundaries]);
+  return JSON.parse(require("node:fs").readFileSync(boundaries, "utf8"));
 }
 async function probeDuration(file) {
   const out = await run("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", file]);

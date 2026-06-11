@@ -15,7 +15,11 @@ test("makeVoiceover synthesizes each scene, concats, writes timings", async () =
   }));
   const synthed = [];
   const deps = {
-    synth: async (text, out) => { synthed.push(text); fs.writeFileSync(out, "x"); },
+    synth: async (text, out) => {
+      synthed.push(text);
+      fs.writeFileSync(out, "x");
+      return [{ text, offsetMs: 100, durationMs: 300 }];
+    },
     probeDuration: async () => 2.5,
     concat: async (_files, out) => fs.writeFileSync(out, "joined"),
   };
@@ -26,4 +30,10 @@ test("makeVoiceover synthesizes each scene, concats, writes timings", async () =
   assert.strictEqual(scenes.total_duration_sec, 5.0);
   assert.ok(fs.existsSync(path.join(dir, "audio", "voiceover.mp3")));
   assert.strictEqual(r.total_duration_sec, 5.0);
+
+  // captions.json assembled from edge-tts word boundaries, offset per scene
+  const caps = JSON.parse(fs.readFileSync(path.join(dir, "captions.json"), "utf8"));
+  assert.strictEqual(caps.length, 2);
+  assert.deepStrictEqual(caps[0], { text: "one", startMs: 100, endMs: 400, timestampMs: 250, confidence: 1 });
+  assert.deepStrictEqual(caps[1], { text: "two", startMs: 2600, endMs: 2900, timestampMs: 2750, confidence: 1 });
 });
