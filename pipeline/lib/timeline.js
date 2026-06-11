@@ -1,3 +1,5 @@
+const { pickFrom } = require("./seed");
+
 function applyTimings(scenes, durationsSec) {
   let cursor = 0;
   const out = scenes.map((s, i) => {
@@ -9,8 +11,9 @@ function applyTimings(scenes, durationsSec) {
   return { scenes: out, total_duration_sec: Math.round(cursor * 1000) / 1000 };
 }
 
-function buildInputProps({ runId, scenesDoc, media, captions, theme, fps }) {
+function buildInputProps({ runId, scenesDoc, media, captions, theme, fps, seed, accentPalette, transitions, musicSrc, musicVolume }) {
   const byId = new Map(media.map((m) => [m.sceneId, m]));
+  const accentColor = pickFrom(seed, accentPalette);
   let frame = 0;
   const scenes = scenesDoc.scenes.map((s) => {
     const durationFrames = Math.round(s.duration_sec * fps);
@@ -21,11 +24,19 @@ function buildInputProps({ runId, scenesDoc, media, captions, theme, fps }) {
       startFrame: frame,
       durationFrames,
       media: m ? { type: m.type, src: `${runId}/${m.file}` } : { type: "image", src: "" },
+      transition: pickFrom(`${seed}:${s.id}`, transitions),
     };
     frame += durationFrames;
     return node;
   });
-  return { fps, width: 1080, height: 1920, audioSrc: `${runId}/voiceover.mp3`, theme, captions, scenes };
+  return {
+    fps, width: 1080, height: 1920,
+    audioSrc: `${runId}/voiceover.mp3`,
+    musicSrc: musicSrc || null,
+    musicVolume,
+    theme: { ...theme, accentColor },
+    captions, scenes,
+  };
 }
 // Build @remotion/captions Caption[] from per-scene edge-tts word boundaries.
 // perScene[i] = [{ text, offsetMs, durationMs }] relative to that scene's audio.

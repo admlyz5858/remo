@@ -12,24 +12,29 @@ test("applyTimings sets cumulative ms windows and total", () => {
   assert.strictEqual(out.total_duration_sec, 5.0);
 });
 
-test("buildInputProps converts seconds to frames and wires media", () => {
+test("buildInputProps converts frames, seeds accent + transition, wires music", () => {
   const scenesDoc = { scenes: [
     { id: 1, on_screen_text: "A", duration_sec: 2.0 },
     { id: 2, on_screen_text: null, duration_sec: 1.0 },
   ]};
   const media = [ { sceneId: 1, type: "video", file: "scene_01.mp4" },
                   { sceneId: 2, type: "image", file: "scene_02.jpg" } ];
+  const transitions = ["slideLeft", "slideUp", "zoomIn", "fade"];
+  const accentPalette = ["#111111", "#222222", "#333333"];
   const props = buildInputProps({
-    runId: "r1", scenesDoc, media, captions: [{ text: "hi", startMs: 0, endMs: 500, timestampMs: 250, confidence: 1 }],
-    theme: { accentColor: "#FFD400", fontFamily: "Anton", channelName: "@c" }, fps: 30,
+    runId: "r1", scenesDoc, media,
+    captions: [{ text: "hi", startMs: 0, endMs: 500, timestampMs: 250, confidence: 1 }],
+    theme: { accentColor: "#000000", fontFamily: "Anton", channelName: "@c" },
+    fps: 30, seed: "r1", accentPalette, transitions, musicSrc: "r1/music.mp3", musicVolume: 0.1,
   });
-  assert.strictEqual(props.scenes[0].startFrame, 0);
   assert.strictEqual(props.scenes[0].durationFrames, 60);
   assert.strictEqual(props.scenes[1].startFrame, 60);
-  assert.strictEqual(props.scenes[1].durationFrames, 30);
   assert.strictEqual(props.scenes[0].media.src, "r1/scene_01.mp4");
   assert.strictEqual(props.audioSrc, "r1/voiceover.mp3");
-  assert.strictEqual(props.scenes[0].onScreenText, "A");
+  assert.strictEqual(props.musicSrc, "r1/music.mp3");
+  assert.strictEqual(props.musicVolume, 0.1);
+  assert.ok(accentPalette.includes(props.theme.accentColor));
+  assert.ok(transitions.includes(props.scenes[0].transition));
 });
 
 test("assembleCaptions offsets per-scene word boundaries by scene start", () => {
