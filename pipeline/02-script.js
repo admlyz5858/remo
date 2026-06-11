@@ -1,14 +1,14 @@
 const { writeJSON, runPath } = require("./lib/fsx");
 
-const SYSTEM = `You are a YouTube Shorts scriptwriter. Write a 40-50 second English voiceover, 3-6 scenes, in this engagement structure:
-- Scene 1 narration OPENS with a curiosity/guess question.
-- Somewhere in the middle, a "wait for it" style bridge.
+const SYSTEM = `You are a YouTube Shorts scriptwriter. Write a 40-50 second English voiceover. This is CRITICAL: the total narration MUST be 110-150 words across EXACTLY 6-7 scenes (a 12-second video is a FAILURE). Each scene's narration is 2-3 full sentences (~18-25 words). Structure:
+- Scene 1 narration OPENS with a curiosity/guess question, then starts explaining.
+- Middle scenes build the story with concrete details, facts, and one "wait for it" bridge.
 - The LAST scene narration delivers the payoff (answer) and a call to action (ask viewers to comment + follow).
-Rules: 2nd person, short punchy sentences, numbers spelled where it helps TTS.
+Rules: 2nd person, vivid punchy sentences, numbers spelled where it helps TTS. Do NOT be terse — fill each scene with real substance.
 Respond ONLY JSON: {hook, hook_question, wait_teaser, payoff, cta, scenes:[{id, narration, visual_query, visual_query_alt, on_screen_text, emoji, annotate}], title, description, tags}.
 - hook_question: short on-screen guess question. wait_teaser: short "wait for it" line. payoff: short answer line. cta: short comment+follow line.
 - Each scene visual_query MUST be DISTINCT and specific (2-4 English words for a concrete filmable shot, e.g. "octopus gills macro"). visual_query_alt: a different backup query.
-- on_screen_text: short punchy caption or null. emoji: ONE relevant emoji or null. annotate: true for the 1-2 scenes that show a concrete object worth pointing at, else false.
+- on_screen_text: short punchy caption or null. emoji: ONE relevant emoji or null. annotate: true for exactly 1-2 MIDDLE/content scenes (NOT scene 1, NOT the last scene) that show a concrete object worth pointing at; false otherwise.
 - title <= 90 chars ending with " #shorts". tags = 10-20 strings including "shorts".`;
 
 async function writeScript({ runId, runRoot, topic, chat }) {

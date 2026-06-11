@@ -30,8 +30,8 @@ export const Short: React.FC<ShortProps> = ({ audioSrc, musicSrc, musicVolume, t
           <Scene scene={scene} accentColor={accent} />
           {scene.onScreenText ? <OnScreenText text={scene.onScreenText} fontFamily={ff} accentColor={accent} /> : null}
           {scene.emoji ? <EmojiPop emoji={scene.emoji} /> : null}
-          {scene.annotation ? <Annotation annotation={scene.annotation} /> : null}
-          {scene.annotation && sfxSrc ? <Audio src={staticFile(sfxSrc)} /> : null}
+          {scene.annotation && scene.id !== last.id ? <Annotation annotation={scene.annotation} /> : null}
+          {scene.annotation && scene.id !== last.id && sfxSrc ? <Audio src={staticFile(sfxSrc)} /> : null}
         </Sequence>
       ))}
       {scenes[0] && hookQuestion ? (

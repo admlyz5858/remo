@@ -4,7 +4,7 @@ module.exports = {
   ttsRate: "+8%",
   stockOrder: ["pexels", "pixabay", "unsplash"],
   model: "deepseek/deepseek-chat",
-  theme: { accentColor: "#FFD400", fontFamily: "Anton", channelName: "@channel" },
+  theme: { accentColor: "#FFD400", fontFamily: "Anton", channelName: "@DustMust" },
   accentPalette: ["#FFD400", "#FF4D6D", "#33D6A6", "#4DA3FF", "#B26BFF"],
   transitions: ["slideLeft", "slideUp", "zoomIn", "fade"],
   // Video-first candidate order used by stage 05.
