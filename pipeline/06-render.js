@@ -2,23 +2,42 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { readJSON, runPath } = require("./lib/fsx");
 const { buildInputProps } = require("./lib/timeline");
+const { pickMusic } = require("./lib/seed");
 
-function prepareRender({ runId, runRoot, pubRoot, theme, fps }) {
+function prepareRender({ runId, runRoot, pubRoot, theme, fps, seed, accentPalette, transitions, musicDir, musicVolume }) {
   const scenesDoc = readJSON(runPath(runRoot, runId, "scenes.json"));
   const media = readJSON(runPath(runRoot, runId, "media.json"));
   const captions = readJSON(runPath(runRoot, runId, "captions.json"));
 
-  // audio lives in run/<id>/audio/voiceover.mp3 → copy into public/<id>/voiceover.mp3
-  const srcAudio = runPath(runRoot, runId, "audio", "voiceover.mp3");
-  const destAudio = path.join(pubRoot, runId, "voiceover.mp3");
-  fs.mkdirSync(path.dirname(destAudio), { recursive: true });
-  fs.copyFileSync(srcAudio, destAudio);
+  const destBase = path.join(pubRoot, runId);
+  fs.mkdirSync(destBase, { recursive: true });
 
-  return buildInputProps({ runId, scenesDoc, media, captions, theme, fps });
+  // audio: run/<id>/audio/voiceover.mp3 -> public/<id>/voiceover.mp3
+  fs.copyFileSync(runPath(runRoot, runId, "audio", "voiceover.mp3"), path.join(destBase, "voiceover.mp3"));
+
+  // music: optional, seeded pick from musicDir
+  let musicSrc = null;
+  try {
+    if (musicDir && fs.existsSync(musicDir)) {
+      const files = fs.readdirSync(musicDir).filter((f) => f.toLowerCase().endsWith(".mp3"));
+      const pick = pickMusic(files, seed);
+      if (pick) {
+        fs.copyFileSync(path.join(musicDir, pick), path.join(destBase, "music.mp3"));
+        musicSrc = `${runId}/music.mp3`;
+      }
+    }
+  } catch (_) { /* music is best-effort */ }
+
+  return buildInputProps({ runId, scenesDoc, media, captions, theme, fps, seed, accentPalette, transitions, musicSrc, musicVolume });
 }
 
 async function render({ runId, runRoot, pubRoot, theme, fps, outFile }) {
-  const inputProps = prepareRender({ runId, runRoot, pubRoot, theme, fps });
+  const cfg = require("./config");
+  const inputProps = prepareRender({
+    runId, runRoot, pubRoot, theme, fps,
+    seed: runId, accentPalette: cfg.accentPalette, transitions: cfg.transitions,
+    musicDir: cfg.music.dir, musicVolume: cfg.music.volume,
+  });
   const { bundle } = require("@remotion/bundler");
   const { renderMedia, selectComposition } = require("@remotion/renderer");
   const serveUrl = await bundle({ entryPoint: path.resolve("remotion/src/index.ts") });
