@@ -3,7 +3,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "test": "node --test pipeline/**/*.test.js",
+    "test": "node --test \"pipeline/**/*.test.js\"",
     "lint": "tsc -p remotion --noEmit"
   },
   "dependencies": {
