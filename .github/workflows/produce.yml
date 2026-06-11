@@ -1,0 +1,64 @@
+name: produce
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+      - name: Install root render deps
+        run: npm install
+      - name: Install Remotion deps
+        run: cd remotion && npm install
+      - name: Run pipeline (topic -> render)
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
+        run: node pipeline/run.js
+      - name: Capture run id
+        id: runid
+        run: echo "id=$(ls -t run | head -1)" >> "$GITHUB_OUTPUT"
+      - name: Upload to YouTube (private)
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: |
+          ID=${{ steps.runid.outputs.id }}
+          python scripts/upload_youtube.py upload \
+            --video out/$ID.mp4 \
+            --meta run/$ID/meta.json \
+            --privacy private \
+            --out run/$ID/upload.json
+          cat run/$ID/upload.json
+      - name: Persist upload result + history
+        run: |
+          ID=${{ steps.runid.outputs.id }}
+          node -e "const fs=require('fs');const u=require('./run/'+process.env.ID+'/upload.json');const h=require('./state/history.json');const e=h.entries.find(x=>x.runId===process.env.ID);if(e){e.video_id=u.video_id;e.url=u.url;}fs.writeFileSync('state/history.json',JSON.stringify(h,null,2));"
+        env: { ID: "${{ steps.runid.outputs.id }}" }
+      - name: Commit state
+        run: |
+          git config user.name "remo-bot"
+          git config user.email "bot@remo"
+          git add state/history.json run/${{ steps.runid.outputs.id }}/upload.json || true
+          git commit -m "run ${{ steps.runid.outputs.id }} uploaded (private)" || echo "nothing to commit"
+          git push || echo "push skipped"
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: short-${{ steps.runid.outputs.id }}
+          path: out/${{ steps.runid.outputs.id }}.mp4
