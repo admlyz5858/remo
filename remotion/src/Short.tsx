@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Sequence, staticFile, useVideoConfig, interpolate } from "remotion";
+import { AbsoluteFill, Sequence, staticFile } from "remotion";
 import { Audio } from "@remotion/media";
 import { loadFont } from "@remotion/google-fonts/Anton";
 import { Scene } from "./components/Scene";
@@ -11,21 +11,6 @@ import type { ShortProps } from "./schema";
 
 const { fontFamily } = loadFont();
 
-const Music: React.FC<{ src: string; volume: number }> = ({ src, volume }) => {
-  const { durationInFrames } = useVideoConfig();
-  return (
-    <Audio
-      src={staticFile(src)}
-      loop
-      volume={(f) =>
-        interpolate(f, [0, 15, durationInFrames - 15, durationInFrames], [0, volume, volume, 0], {
-          extrapolateLeft: "clamp", extrapolateRight: "clamp",
-        })
-      }
-    />
-  );
-};
-
 export const Short: React.FC<ShortProps> = ({ audioSrc, musicSrc, musicVolume, theme, captions, scenes }) => {
   const ff = theme.fontFamily === "Anton" ? fontFamily : theme.fontFamily;
   const accent = theme.accentColor;
@@ -33,7 +18,7 @@ export const Short: React.FC<ShortProps> = ({ audioSrc, musicSrc, musicVolume, t
   return (
     <AbsoluteFill style={{ backgroundColor: "black" }}>
       <Audio src={staticFile(audioSrc)} />
-      {musicSrc ? <Music src={musicSrc} volume={musicVolume} /> : null}
+      {musicSrc ? <Audio src={staticFile(musicSrc)} loop volume={musicVolume} /> : null}
       {scenes.map((scene) => (
         <Sequence key={scene.id} from={scene.startFrame} durationInFrames={scene.durationFrames}>
           <Scene scene={scene} accentColor={accent} />
