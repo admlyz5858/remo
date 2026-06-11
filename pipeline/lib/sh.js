@@ -1,0 +1,23 @@
+const { spawn } = require("node:child_process");
+
+function run(cmd, args) {
+  return new Promise((resolve, reject) => {
+    const p = spawn(cmd, args, { stdio: ["ignore", "pipe", "inherit"] });
+    let out = "";
+    p.stdout.on("data", (d) => (out += d));
+    p.on("close", (code) => (code === 0 ? resolve(out.trim()) : reject(new Error(`${cmd} exited ${code}`))));
+  });
+}
+async function synth(text, out, voice, rate) {
+  await run("python", ["scripts/tts.py", "--text", text, "--voice", voice, "--rate", rate, "--out", out]);
+}
+async function probeDuration(file) {
+  const out = await run("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", file]);
+  return parseFloat(out);
+}
+async function concat(files, out) {
+  const listFile = out + ".txt";
+  require("node:fs").writeFileSync(listFile, files.map((f) => `file '${require("node:path").resolve(f)}'`).join("\n"));
+  await run("ffmpeg", ["-y", "-f", "concat", "-safe", "0", "-i", listFile, "-c", "copy", out]);
+}
+module.exports = { run, synth, probeDuration, concat };
