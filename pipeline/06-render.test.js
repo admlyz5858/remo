@@ -47,3 +47,26 @@ test("prepareRender selects + copies a music track when present", () => {
   assert.ok(meta.description.includes("incompetech")); // CC-BY credit appended
   assert.deepStrictEqual(props.scenes[0].annotation, { box: { x: 0.5, y: 0.4, w: 0.2, h: 0.2 }, label: "x", type: "circle" });
 });
+
+const { prepareCommentsRender } = require("./06-render");
+
+test("prepareCommentsRender copies audio + builds comments props", () => {
+  const runRoot = fs.mkdtempSync(path.join(os.tmpdir(), "cr-"));
+  const pubRoot = fs.mkdtempSync(path.join(os.tmpdir(), "cpub-"));
+  const dir = path.join(runRoot, "r1"); fs.mkdirSync(path.join(dir, "audio"), { recursive: true });
+  fs.mkdirSync(path.join(pubRoot, "r1"), { recursive: true });
+  fs.writeFileSync(path.join(dir, "audio", "voiceover.mp3"), "AUDIO");
+  fs.writeFileSync(path.join(dir, "captions.json"), JSON.stringify([]));
+  fs.writeFileSync(path.join(dir, "deck.json"), JSON.stringify({
+    subreddit: "AskReddit", question: "Q?",
+    segments: [{ kind: "question", author: null, upvotes: null, text: "Q?", duration_sec: 2.0 },
+               { kind: "comment", author: "u/a", upvotes: "1k", text: "c", duration_sec: 1.0 }],
+  }));
+  const props = prepareCommentsRender({
+    runId: "r1", runRoot, pubRoot, theme: { accentColor: "#000", fontFamily: "Anton", channelName: "@h" },
+    fps: 30, seed: "r1", accentPalette: ["#111"], musicDir: path.join(runRoot, "no"), musicVolume: 0.1, sfxDir: path.join(runRoot, "no"),
+  });
+  assert.strictEqual(props.backgroundSrc, "r1/bg.mp4");
+  assert.strictEqual(props.segments[1].durationFrames, 30);
+  assert.strictEqual(fs.readFileSync(path.join(pubRoot, "r1", "voiceover.mp3"), "utf8"), "AUDIO");
+});

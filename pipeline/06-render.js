@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { readJSON, writeJSON, runPath } = require("./lib/fsx");
-const { buildInputProps } = require("./lib/timeline");
+const { buildInputProps, buildCommentsProps } = require("./lib/timeline");
 const { pickMusic } = require("./lib/seed");
 
 const MUSIC_CREDIT =
@@ -50,6 +50,18 @@ function prepareRender({ runId, runRoot, pubRoot, theme, fps, seed, accentPalett
   return buildInputProps({ runId, scenesDoc, media, captions, theme, fps, seed, accentPalette, transitions, musicSrc, musicVolume, annotations, sfxSrc });
 }
 
+function prepareCommentsRender({ runId, runRoot, pubRoot, theme, fps, seed, accentPalette, musicDir, musicVolume, sfxDir }) {
+  const deck = readJSON(runPath(runRoot, runId, "deck.json"));
+  const captions = readJSON(runPath(runRoot, runId, "captions.json"));
+  const destBase = path.join(pubRoot, runId);
+  fs.mkdirSync(destBase, { recursive: true });
+  fs.copyFileSync(runPath(runRoot, runId, "audio", "voiceover.mp3"), path.join(destBase, "voiceover.mp3"));
+  const musicSrc = pickAsset(musicDir, seed, destBase, "music.mp3", runId);
+  const sfxSrc = pickAsset(sfxDir, `${seed}:sfx`, destBase, "sfx.mp3", runId);
+  const backgroundSrc = `${runId}/bg.mp4`;
+  return buildCommentsProps({ runId, deck, captions, theme, fps, seed, accentPalette, musicSrc, musicVolume, sfxSrc, backgroundSrc });
+}
+
 async function render({ runId, runRoot, pubRoot, theme, fps, outFile }) {
   const cfg = require("./config");
   const inputProps = prepareRender({
@@ -65,7 +77,18 @@ async function render({ runId, runRoot, pubRoot, theme, fps, outFile }) {
   await renderMedia({ serveUrl, composition, codec: "h264", outputLocation: outFile, inputProps });
   return outFile;
 }
-module.exports = { prepareRender, render };
+async function renderComments({ runId, runRoot, pubRoot, theme, fps, outFile }) {
+  const cfg = require("./config");
+  const inputProps = prepareCommentsRender({ runId, runRoot, pubRoot, theme, fps, seed: runId, accentPalette: cfg.accentPalette, musicDir: cfg.music.dir, musicVolume: cfg.music.volume, sfxDir: cfg.sfx.dir });
+  const { bundle } = require("@remotion/bundler");
+  const { renderMedia, selectComposition } = require("@remotion/renderer");
+  const serveUrl = await bundle({ entryPoint: path.resolve("remotion/src/index.ts") });
+  const composition = await selectComposition({ serveUrl, id: "Comments", inputProps });
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
+  await renderMedia({ serveUrl, composition, codec: "h264", outputLocation: outFile, inputProps });
+  return outFile;
+}
+module.exports = { prepareRender, render, prepareCommentsRender, renderComments };
 
 if (require.main === module) {
   const cfg = require("./config");
