@@ -10,3 +10,10 @@ test("config has render + stock + voice defaults", () => {
   assert.ok(cfg.voice.startsWith("en-US-"));
   assert.ok(cfg.theme.accentColor.startsWith("#"));
 });
+
+test("config has accentPalette, transitions, music", () => {
+  assert.ok(Array.isArray(cfg.accentPalette) && cfg.accentPalette.length >= 3);
+  assert.deepStrictEqual(cfg.transitions, ["slideLeft", "slideUp", "zoomIn", "fade"]);
+  assert.strictEqual(cfg.music.dir, "remotion/public/music");
+  assert.ok(cfg.music.volume > 0 && cfg.music.volume < 1);
+});
