@@ -10,4 +10,19 @@ async function findMedia(query, order, providers) {
   }
   return null;
 }
-module.exports = { findMedia };
+// Returns a flat, ordered list of candidates across providers (best-effort).
+async function findMediaCandidates(query, order, providers) {
+  const out = [];
+  for (const name of order) {
+    const fn = providers[name];
+    if (!fn) continue;
+    try {
+      const hits = await fn(query);
+      for (const h of hits || []) {
+        if (h && h.url) out.push({ ...h, provider: name });
+      }
+    } catch (_) { /* skip provider */ }
+  }
+  return out;
+}
+module.exports = { findMedia, findMediaCandidates };
