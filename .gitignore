@@ -1,0 +1,11 @@
+node_modules/
+run/
+out/
+remotion/public/*/
+!remotion/public/.gitkeep
+*.mp4
+*.mp3
+*.wav
+.env
+__pycache__/
+remotion/node_modules/
