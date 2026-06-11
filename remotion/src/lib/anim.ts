@@ -46,3 +46,17 @@ export function transitionStyle(variant: string, p: number): TransitionTransform
     default: return { x: 0, y: 0, scale: 1, opacity: t };
   }
 }
+
+export function drawProgress(frame: number, startFrame: number, frames: number): number {
+  if (frames <= 0) return 1;
+  return Math.min(Math.max((frame - startFrame) / frames, 0), 1);
+}
+
+export function dashOffsetFor(length: number, p: number): number {
+  return length * (1 - Math.min(Math.max(p, 0), 1));
+}
+
+// box: normalized center (x,y) + size (w,h). Returns pixel center + size.
+export function boxToScreen(box: { x: number; y: number; w: number; h: number }, W: number, H: number) {
+  return { cx: box.x * W, cy: box.y * H, w: box.w * W, h: box.h * H };
+}
