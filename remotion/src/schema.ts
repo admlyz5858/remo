@@ -14,6 +14,7 @@ export const sceneSchema = z.object({
   startFrame: z.number(),
   durationFrames: z.number(),
   media: z.object({ type: z.enum(["video", "image"]), src: z.string() }),
+  transition: z.string(),
 });
 
 export const themeSchema = z.object({
@@ -27,6 +28,8 @@ export const shortSchema = z.object({
   width: z.number(),
   height: z.number(),
   audioSrc: z.string(),
+  musicSrc: z.string().nullable(),
+  musicVolume: z.number(),
   theme: themeSchema,
   captions: z.array(captionSchema),
   scenes: z.array(sceneSchema),
