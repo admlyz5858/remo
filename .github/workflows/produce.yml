@@ -32,6 +32,11 @@ jobs:
       - name: Capture run id
         id: runid
         run: echo "id=$(ls -t run | head -1)" >> "$GITHUB_OUTPUT"
+      - name: Upload video artifact (rendered short)
+        uses: actions/upload-artifact@v4
+        with:
+          name: short-${{ steps.runid.outputs.id }}
+          path: out/${{ steps.runid.outputs.id }}.mp4
       - name: Upload to YouTube (private)
         env:
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
@@ -57,8 +62,3 @@ jobs:
           git add state/history.json run/${{ steps.runid.outputs.id }}/upload.json || true
           git commit -m "run ${{ steps.runid.outputs.id }} uploaded (private)" || echo "nothing to commit"
           git push || echo "push skipped"
-      - name: Upload video artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: short-${{ steps.runid.outputs.id }}
-          path: out/${{ steps.runid.outputs.id }}.mp4
