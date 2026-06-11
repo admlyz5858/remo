@@ -9,7 +9,6 @@ const { makeVoiceover } = require("./03-voiceover");
 const { fetchSceneMedia } = require("./05-media");
 const { render } = require("./06-render");
 const sh = require("./lib/sh");
-const { findMedia } = require("./lib/stock");
 const providers = require("./lib/providers");
 const { download } = require("./lib/download");
 
@@ -38,12 +37,14 @@ async function main() {
   const voDeps = { synth: sh.synth, probeDuration: sh.probeDuration, concat: sh.concat };
   await makeVoiceover({ runId, runRoot, voice: cfg.voice, rate: cfg.ttsRate, deps: voDeps });
 
+  const { findMediaCandidates } = require("./lib/stock");
   const provFns = {
-    pexels: (q) => providers.pexels(q, { apiKey: process.env.PEXELS_API_KEY }),
-    pixabay: (q) => providers.pixabay(q, { apiKey: process.env.PIXABAY_API_KEY }),
-    unsplash: (q) => providers.unsplash(q, { apiKey: process.env.UNSPLASH_API_KEY }),
+    pexelsVideo: (q) => providers.pexelsVideoCandidates(q, { apiKey: process.env.PEXELS_API_KEY }),
+    pixabayVideo: (q) => providers.pixabayVideoCandidates(q, { apiKey: process.env.PIXABAY_API_KEY }),
+    pixabayPhoto: (q) => providers.pixabayPhotoCandidates(q, { apiKey: process.env.PIXABAY_API_KEY }),
+    unsplash: (q) => providers.unsplashCandidates(q, { apiKey: process.env.UNSPLASH_API_KEY }),
   };
-  const find = (q) => findMedia(q, cfg.stockOrder, provFns);
+  const find = (q) => findMediaCandidates(q, cfg.mediaOrder, provFns);
   await fetchSceneMedia({ runId, runRoot, pubRoot: "remotion/public", find, download });
 
   const outFile = `out/${runId}.mp4`;
