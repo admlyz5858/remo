@@ -51,3 +51,25 @@ export const shortSchema = z.object({
 export type ShortProps = z.infer<typeof shortSchema>;
 export type SceneNode = z.infer<typeof sceneSchema>;
 export type CaptionItem = z.infer<typeof captionSchema>;
+
+export const segmentSchema = z.object({
+  kind: z.enum(["question", "comment"]),
+  author: z.string().nullable(),
+  upvotes: z.string().nullable(),
+  text: z.string(),
+  startFrame: z.number(),
+  durationFrames: z.number(),
+});
+
+export const commentsSchema = z.object({
+  fps: z.number(), width: z.number(), height: z.number(),
+  audioSrc: z.string(),
+  musicSrc: z.string().nullable(), musicVolume: z.number(), sfxSrc: z.string().nullable(),
+  backgroundSrc: z.string(),
+  subreddit: z.string(), question: z.string(),
+  theme: themeSchema,
+  captions: z.array(captionSchema),
+  segments: z.array(segmentSchema),
+});
+export type CommentsProps = z.infer<typeof commentsSchema>;
+export type Segment = z.infer<typeof segmentSchema>;
