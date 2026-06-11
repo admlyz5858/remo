@@ -7,6 +7,8 @@ remotion/public/*/
 *.mp4
 *.mp3
 !remotion/public/music/*.mp3
+!remotion/public/sfx/
+!remotion/public/sfx/*.mp3
 *.wav
 .env
 __pycache__/

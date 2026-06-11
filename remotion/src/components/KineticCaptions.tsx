@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { activeCaptionIndex, popScale } from "../lib/anim";
 import type { CaptionItem } from "../schema";
 
-const WINDOW = 4;
-const POP_MS = 180;
+const WINDOW = 3;
+const POP_MS = 140;
 
 export const KineticCaptions: React.FC<{ captions: CaptionItem[]; fontFamily: string; accentColor: string }> = ({
   captions, fontFamily, accentColor,
@@ -20,11 +20,11 @@ export const KineticCaptions: React.FC<{ captions: CaptionItem[]; fontFamily: st
   const win = captions.slice(start, end);
   const activeCap = captions[active];
   const popP = Math.min(Math.max((ms - activeCap.startMs) / POP_MS, 0), 1);
-  const activeScale = popScale(popP);
+  const activeScale = 1 + (popScale(popP) - 1) * 0.4;
 
   return (
-    <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "center", paddingBottom: 380 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, maxWidth: "88%", textAlign: "center" }}>
+    <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "center", paddingBottom: 360 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12, maxWidth: "90%", textAlign: "center" }}>
         {win.map((c, i) => {
           const idx = start + i;
           const isActive = idx === active;
@@ -32,17 +32,12 @@ export const KineticCaptions: React.FC<{ captions: CaptionItem[]; fontFamily: st
             <span
               key={idx}
               style={{
-                position: "relative",
-                fontFamily, fontWeight: 800, lineHeight: 1.05,
-                fontSize: isActive ? 80 : 64,
-                color: isActive ? "#000" : "white",
-                opacity: isActive ? 1 : 0.55,
-                transform: `scale(${isActive ? activeScale : 0.9}) translateY(${isActive ? -8 : 0}px)`,
-                background: isActive ? accentColor : "transparent",
-                padding: isActive ? "2px 16px" : "0",
-                borderRadius: 12,
-                WebkitTextStroke: isActive ? "0px" : "3px black",
+                fontFamily, fontWeight: 800, lineHeight: 1.05, fontSize: 74,
+                color: isActive ? accentColor : "white",
+                transform: `scale(${isActive ? activeScale : 1})`,
+                WebkitTextStroke: "4px black",
                 paintOrder: "stroke fill",
+                textShadow: "0 4px 10px rgba(0,0,0,0.6)",
               }}
             >
               {c.text}

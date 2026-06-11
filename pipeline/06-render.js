@@ -18,32 +18,36 @@ function appendMusicCredit(runRoot, runId) {
   writeJSON(metaPath, meta);
 }
 
-function prepareRender({ runId, runRoot, pubRoot, theme, fps, seed, accentPalette, transitions, musicDir, musicVolume }) {
+function pickAsset(dir, seed, destBase, destName, runId) {
+  try {
+    if (dir && fs.existsSync(dir)) {
+      const files = fs.readdirSync(dir).filter((f) => f.toLowerCase().endsWith(".mp3"));
+      const pick = pickMusic(files, seed);
+      if (pick) {
+        fs.copyFileSync(path.join(dir, pick), path.join(destBase, destName));
+        return `${runId}/${destName}`;
+      }
+    }
+  } catch (_) { /* best-effort */ }
+  return null;
+}
+
+function prepareRender({ runId, runRoot, pubRoot, theme, fps, seed, accentPalette, transitions, musicDir, musicVolume, sfxDir }) {
   const scenesDoc = readJSON(runPath(runRoot, runId, "scenes.json"));
   const media = readJSON(runPath(runRoot, runId, "media.json"));
   const captions = readJSON(runPath(runRoot, runId, "captions.json"));
+  const annPath = runPath(runRoot, runId, "annotations.json");
+  const annotations = fs.existsSync(annPath) ? readJSON(annPath) : [];
 
   const destBase = path.join(pubRoot, runId);
   fs.mkdirSync(destBase, { recursive: true });
-
-  // audio: run/<id>/audio/voiceover.mp3 -> public/<id>/voiceover.mp3
   fs.copyFileSync(runPath(runRoot, runId, "audio", "voiceover.mp3"), path.join(destBase, "voiceover.mp3"));
 
-  // music: optional, seeded pick from musicDir
-  let musicSrc = null;
-  try {
-    if (musicDir && fs.existsSync(musicDir)) {
-      const files = fs.readdirSync(musicDir).filter((f) => f.toLowerCase().endsWith(".mp3"));
-      const pick = pickMusic(files, seed);
-      if (pick) {
-        fs.copyFileSync(path.join(musicDir, pick), path.join(destBase, "music.mp3"));
-        musicSrc = `${runId}/music.mp3`;
-        appendMusicCredit(runRoot, runId);
-      }
-    }
-  } catch (_) { /* music is best-effort */ }
+  const musicSrc = pickAsset(musicDir, seed, destBase, "music.mp3", runId);
+  if (musicSrc) appendMusicCredit(runRoot, runId);
+  const sfxSrc = pickAsset(sfxDir, `${seed}:sfx`, destBase, "sfx.mp3", runId);
 
-  return buildInputProps({ runId, scenesDoc, media, captions, theme, fps, seed, accentPalette, transitions, musicSrc, musicVolume });
+  return buildInputProps({ runId, scenesDoc, media, captions, theme, fps, seed, accentPalette, transitions, musicSrc, musicVolume, annotations, sfxSrc });
 }
 
 async function render({ runId, runRoot, pubRoot, theme, fps, outFile }) {
@@ -51,7 +55,7 @@ async function render({ runId, runRoot, pubRoot, theme, fps, outFile }) {
   const inputProps = prepareRender({
     runId, runRoot, pubRoot, theme, fps,
     seed: runId, accentPalette: cfg.accentPalette, transitions: cfg.transitions,
-    musicDir: cfg.music.dir, musicVolume: cfg.music.volume,
+    musicDir: cfg.music.dir, musicVolume: cfg.music.volume, sfxDir: cfg.sfx.dir,
   });
   const { bundle } = require("@remotion/bundler");
   const { renderMedia, selectComposition } = require("@remotion/renderer");

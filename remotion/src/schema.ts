@@ -8,13 +8,21 @@ export const captionSchema = z.object({
   confidence: z.number().nullable(),
 });
 
+export const annotationSchema = z.object({
+  box: z.object({ x: z.number(), y: z.number(), w: z.number(), h: z.number() }),
+  label: z.string(),
+  type: z.enum(["arrow", "circle"]),
+});
+
 export const sceneSchema = z.object({
   id: z.number(),
   onScreenText: z.string().nullable(),
+  emoji: z.string().nullable(),
   startFrame: z.number(),
   durationFrames: z.number(),
   media: z.object({ type: z.enum(["video", "image"]), src: z.string() }),
   transition: z.string(),
+  annotation: annotationSchema.nullable(),
 });
 
 export const themeSchema = z.object({
@@ -30,6 +38,11 @@ export const shortSchema = z.object({
   audioSrc: z.string(),
   musicSrc: z.string().nullable(),
   musicVolume: z.number(),
+  sfxSrc: z.string().nullable(),
+  hookQuestion: z.string().nullable(),
+  waitTeaser: z.string().nullable(),
+  payoff: z.string().nullable(),
+  cta: z.string().nullable(),
   theme: themeSchema,
   captions: z.array(captionSchema),
   scenes: z.array(sceneSchema),

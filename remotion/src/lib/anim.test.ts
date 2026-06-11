@@ -48,3 +48,24 @@ test("transitionStyle maps variants to numeric transforms", () => {
   assert.strictEqual(transitionStyle("zoomIn", 0).scale, 0.8);
   assert.strictEqual(transitionStyle("fade", 0).opacity, 0);
 });
+
+import { drawProgress, dashOffsetFor, boxToScreen } from "./anim";
+
+test("drawProgress ramps 0..1 from startFrame over frames", () => {
+  assert.strictEqual(drawProgress(10, 10, 8), 0);
+  assert.strictEqual(drawProgress(14, 10, 8), 0.5);
+  assert.strictEqual(drawProgress(20, 10, 8), 1);
+});
+
+test("dashOffsetFor goes length..0", () => {
+  assert.strictEqual(dashOffsetFor(100, 0), 100);
+  assert.strictEqual(dashOffsetFor(100, 1), 0);
+});
+
+test("boxToScreen maps normalized center+size to px", () => {
+  const r = boxToScreen({ x: 0.5, y: 0.5, w: 0.2, h: 0.1 }, 1000, 2000);
+  assert.strictEqual(r.cx, 500);
+  assert.strictEqual(r.cy, 1000);
+  assert.strictEqual(r.w, 200);
+  assert.strictEqual(r.h, 200);
+});

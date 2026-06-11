@@ -10,4 +10,6 @@ module.exports = {
   // Video-first candidate order used by stage 05.
   mediaOrder: ["pexelsVideo", "pixabayVideo", "pixabayPhoto", "unsplash"],
   music: { dir: "remotion/public/music", volume: 0.1 },
+  sfx: { dir: "remotion/public/sfx" },
+  visionModel: "gemini-flash-latest",
 };
