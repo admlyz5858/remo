@@ -1,8 +1,22 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { readJSON, runPath } = require("./lib/fsx");
+const { readJSON, writeJSON, runPath } = require("./lib/fsx");
 const { buildInputProps } = require("./lib/timeline");
 const { pickMusic } = require("./lib/seed");
+
+const MUSIC_CREDIT =
+  "Music: Kevin MacLeod (incompetech.com) — Licensed under Creative Commons: By Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/)";
+
+// CC-BY requires crediting the track in the description; append once (idempotent).
+function appendMusicCredit(runRoot, runId) {
+  const metaPath = runPath(runRoot, runId, "meta.json");
+  if (!fs.existsSync(metaPath)) return;
+  const meta = readJSON(metaPath);
+  const desc = meta.description || "";
+  if (desc.includes("incompetech")) return;
+  meta.description = `${desc}\n\n${MUSIC_CREDIT}`.trim();
+  writeJSON(metaPath, meta);
+}
 
 function prepareRender({ runId, runRoot, pubRoot, theme, fps, seed, accentPalette, transitions, musicDir, musicVolume }) {
   const scenesDoc = readJSON(runPath(runRoot, runId, "scenes.json"));
@@ -24,6 +38,7 @@ function prepareRender({ runId, runRoot, pubRoot, theme, fps, seed, accentPalett
       if (pick) {
         fs.copyFileSync(path.join(musicDir, pick), path.join(destBase, "music.mp3"));
         musicSrc = `${runId}/music.mp3`;
+        appendMusicCredit(runRoot, runId);
       }
     }
   } catch (_) { /* music is best-effort */ }

@@ -10,6 +10,7 @@ function seedRun(runRoot, pubRoot) {
   fs.writeFileSync(path.join(dir, "scenes.json"), JSON.stringify({ scenes: [{ id: 1, on_screen_text: "A", duration_sec: 2.0 }], total_duration_sec: 2.0 }));
   fs.writeFileSync(path.join(dir, "media.json"), JSON.stringify([{ sceneId: 1, type: "video", file: "scene_01.mp4" }]));
   fs.writeFileSync(path.join(dir, "captions.json"), JSON.stringify([{ text: "hi", startMs: 0, endMs: 500, timestampMs: 250, confidence: 1 }]));
+  fs.writeFileSync(path.join(dir, "meta.json"), JSON.stringify({ title: "T", description: "A quick fact.", tags: ["shorts"] }));
 }
 const baseArgs = (runRoot, pubRoot, musicDir) => ({
   runId: "r1", runRoot, pubRoot,
@@ -27,6 +28,8 @@ test("prepareRender copies audio, builds props, no music when dir empty/missing"
   assert.strictEqual(props.audioSrc, "r1/voiceover.mp3");
   assert.strictEqual(props.musicSrc, null);
   assert.strictEqual(fs.readFileSync(path.join(pubRoot, "r1", "voiceover.mp3"), "utf8"), "AUDIO");
+  const meta = JSON.parse(fs.readFileSync(path.join(runRoot, "r1", "meta.json"), "utf8"));
+  assert.ok(!meta.description.includes("incompetech")); // no credit when no music
 });
 
 test("prepareRender selects + copies a music track when present", () => {
@@ -39,4 +42,6 @@ test("prepareRender selects + copies a music track when present", () => {
   const props = prepareRender(baseArgs(runRoot, pubRoot, musicDir));
   assert.strictEqual(props.musicSrc, "r1/music.mp3");
   assert.ok(fs.existsSync(path.join(pubRoot, "r1", "music.mp3")));
+  const meta = JSON.parse(fs.readFileSync(path.join(runRoot, "r1", "meta.json"), "utf8"));
+  assert.ok(meta.description.includes("incompetech")); // CC-BY credit appended
 });
