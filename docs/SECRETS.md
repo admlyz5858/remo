@@ -15,3 +15,12 @@ Copy values from otomasyon/.env:
 Trigger production: `gh workflow run produce.yml`
 Approve:  `gh workflow run publish.yml -f video_id=<ID> -f action=approve`
 Reject:   `gh workflow run publish.yml -f video_id=<ID> -f action=reject`
+
+## Comments mode secrets
+| Secret | Purpose |
+|---|---|
+| REDDIT_USER_AGENT | e.g. `remo-bot/1.0 (by /u/yourname)` — required by Reddit JSON |
+| YOUTUBE_API_KEY | YouTube Data API key (optional YouTube comments source) |
+| YT_COMMENTS_REFRESH_TOKEN | refresh token for the SECOND channel (authorize via scripts/get_youtube_token.js) |
+
+Produce comments: `gh workflow run produce.yml -f mode=comments`
