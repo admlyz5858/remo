@@ -12,7 +12,7 @@ export const QuestionCard: React.FC<{ subreddit: string; question: string; fontF
       <div style={{ transform: `translateY(${y}px)`, opacity: o, width: "88%", background: "white", borderRadius: 22, padding: "22px 26px", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
           <div style={{ width: 36, height: 36, borderRadius: "50%", background: accentColor }} />
-          <div style={{ fontFamily, fontWeight: 800, fontSize: 30, color: "#1a1a1b" }}>r/{subreddit}</div>
+          <div style={{ fontFamily, fontWeight: 800, fontSize: 30, color: "#1a1a1b" }}>{subreddit}</div>
         </div>
         <div style={{ fontFamily, fontWeight: 800, fontSize: 44, color: "#1a1a1b", lineHeight: 1.15 }}>{question}</div>
       </div>
