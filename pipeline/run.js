@@ -47,6 +47,21 @@ async function main() {
   const find = (q) => findMediaCandidates(q, cfg.mediaOrder, provFns);
   await fetchSceneMedia({ runId, runRoot, pubRoot: "remotion/public", find, download });
 
+  // Stage 05c: AI-vision annotations (best-effort)
+  const { annotateScenes } = require("./05c-annotate");
+  const { extractFrame } = require("./lib/frame");
+  const { detectSubject } = require("./lib/vision");
+  try {
+    await annotateScenes({
+      runId, runRoot, pubRoot: "remotion/public", seed: runId,
+      deps: {
+        extractFrame,
+        detect: ({ imageBase64, narration, query }) =>
+          detectSubject({ apiKey: process.env.GEMINI_API_KEY, imageBase64, narration, query, model: cfg.visionModel }),
+      },
+    });
+  } catch (e) { console.log("annotation skipped:", e.message); }
+
   const outFile = `out/${runId}.mp4`;
   await render({ runId, runRoot, pubRoot: "remotion/public", theme: cfg.theme, fps: cfg.render.fps, outFile });
 

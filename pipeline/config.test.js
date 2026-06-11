@@ -17,3 +17,8 @@ test("config has accentPalette, transitions, music", () => {
   assert.strictEqual(cfg.music.dir, "remotion/public/music");
   assert.ok(cfg.music.volume > 0 && cfg.music.volume < 1);
 });
+
+test("config has sfx dir + vision model", () => {
+  assert.strictEqual(cfg.sfx.dir, "remotion/public/sfx");
+  assert.ok(typeof cfg.visionModel === "string" && cfg.visionModel.length > 0);
+});
