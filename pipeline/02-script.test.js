@@ -9,7 +9,13 @@ test("writeScript persists scenes.json and meta.json", async () => {
   const fakeChat = async () => ({
     hook: "Octopuses have THREE hearts.",
     cta: "Follow for more.",
-    scenes: [{ id: 1, narration: "Octopuses have three hearts.", visual_query: "octopus closeup", visual_query_alt: "deep ocean", on_screen_text: "3 HEARTS" }],
+    hook_question: "Which has 3 hearts — octopus or squid?",
+    wait_teaser: "But the weird part is next.",
+    payoff: "Yep — octopuses have three hearts!",
+    scenes: [
+      { id: 1, narration: "Octopuses have three hearts.", visual_query: "octopus closeup", visual_query_alt: "deep ocean", on_screen_text: "3 HEARTS", emoji: "🐙", annotate: true },
+      { id: 2, narration: "Two pump blood to the gills.", visual_query: "octopus gills macro", visual_query_alt: "octopus swimming", on_screen_text: null, emoji: "❤️", annotate: false },
+    ],
     title: "Why Octopuses Have 3 Hearts #shorts",
     description: "A quick fact.",
     tags: ["octopus", "shorts"],
@@ -22,5 +28,11 @@ test("writeScript persists scenes.json and meta.json", async () => {
   assert.strictEqual(scenes.audio_path, "audio/voiceover.mp3");
   assert.match(meta.title, /Octopuses/);
   assert.ok(meta.tags.includes("shorts"));
-  assert.strictEqual(r.scenes.scenes.length, 1);
+  assert.strictEqual(r.scenes.scenes.length, 2);
+  assert.strictEqual(scenes.hook_question, "Which has 3 hearts — octopus or squid?");
+  assert.strictEqual(scenes.wait_teaser, "But the weird part is next.");
+  assert.strictEqual(scenes.payoff, "Yep — octopuses have three hearts!");
+  assert.strictEqual(scenes.scenes[0].emoji, "🐙");
+  assert.strictEqual(scenes.scenes[0].annotate, true);
+  assert.strictEqual(scenes.scenes[1].annotate, false);
 });
