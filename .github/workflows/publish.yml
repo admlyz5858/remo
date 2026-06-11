@@ -1,0 +1,48 @@
+name: publish
+on:
+  workflow_dispatch:
+    inputs:
+      video_id:
+        description: "YouTube video id"
+        required: true
+      action:
+        description: "approve or reject"
+        required: true
+        default: "approve"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+      - name: Approve or reject
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: |
+          if [ "${{ inputs.action }}" = "approve" ]; then
+            python scripts/upload_youtube.py publish --video-id "${{ inputs.video_id }}"
+          else
+            python scripts/upload_youtube.py delete --video-id "${{ inputs.video_id }}"
+          fi
+      - name: Update history status
+        run: |
+          node -e "const fs=require('fs');const h=require('./state/history.json');const e=h.entries.find(x=>x.video_id===process.env.VID);if(e){e.status=process.env.ACT==='approve'?'published':'rejected';}fs.writeFileSync('state/history.json',JSON.stringify(h,null,2));"
+        env:
+          VID: "${{ inputs.video_id }}"
+          ACT: "${{ inputs.action }}"
+      - name: Commit
+        run: |
+          git config user.name "remo-bot"
+          git config user.email "bot@remo"
+          git add state/history.json || true
+          git commit -m "publish ${{ inputs.action }} ${{ inputs.video_id }}" || echo "nothing"
+          git push || echo "push skipped"
