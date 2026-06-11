@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert";
 import { kenBurnsScale, fadeOpacity, activeCaptionIndex } from "./anim";
+import { popScale, punchZoom, staggerReveal, transitionStyle } from "./anim";
 
 test("kenBurnsScale goes 1 → 1.08 across duration", () => {
   assert.strictEqual(kenBurnsScale(0, 100), 1);
@@ -21,4 +22,29 @@ test("activeCaptionIndex finds caption covering the ms, else -1", () => {
   assert.strictEqual(activeCaptionIndex(caps, 250), 0);
   assert.strictEqual(activeCaptionIndex(caps, 600), 1);
   assert.strictEqual(activeCaptionIndex(caps, 2000), -1);
+});
+
+test("popScale overshoots then settles to 1", () => {
+  assert.ok(Math.abs(popScale(0) - 0.6) < 1e-9);
+  assert.ok(popScale(0.7) > 1.1);
+  assert.ok(Math.abs(popScale(1) - 1) < 1e-9);
+});
+
+test("punchZoom goes 1.12 -> 1.0", () => {
+  assert.ok(Math.abs(punchZoom(0) - 1.12) < 1e-9);
+  assert.ok(Math.abs(punchZoom(1) - 1.0) < 1e-9);
+});
+
+test("staggerReveal gives per-index 0..1 progress", () => {
+  assert.strictEqual(staggerReveal(0, 0, 30, 6), 0);
+  assert.strictEqual(staggerReveal(0, 6, 30, 6), 1);
+  assert.strictEqual(staggerReveal(2, 6, 30, 6), 0);
+});
+
+test("transitionStyle maps variants to numeric transforms", () => {
+  assert.deepStrictEqual(transitionStyle("slideLeft", 0), { x: 100, y: 0, scale: 1, opacity: 1 });
+  assert.deepStrictEqual(transitionStyle("slideLeft", 1), { x: 0, y: 0, scale: 1, opacity: 1 });
+  assert.deepStrictEqual(transitionStyle("slideUp", 0), { x: 0, y: 100, scale: 1, opacity: 1 });
+  assert.strictEqual(transitionStyle("zoomIn", 0).scale, 0.8);
+  assert.strictEqual(transitionStyle("fade", 0).opacity, 0);
 });
