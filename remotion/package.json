@@ -1,7 +1,7 @@
 {
   "name": "remo-remotion",
   "private": true,
-  "scripts": { "studio": "remotion studio", "lint": "tsc --noEmit" },
+  "scripts": { "studio": "remotion studio", "lint": "tsc --noEmit", "test": "node --import tsx --test src/**/*.test.ts" },
   "dependencies": {
     "@remotion/captions": "^4.0.0",
     "@remotion/cli": "^4.0.0",
