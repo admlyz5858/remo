@@ -43,4 +43,47 @@ async function unsplash(query, { apiKey, fetchImpl = fetch }) {
   return hit && hit.urls ? { type: "image", url: hit.urls.regular } : null;
 }
 
-module.exports = { pexels, pixabay, unsplash, pickPortraitVideo };
+async function pexelsVideoCandidates(query, { apiKey, fetchImpl = fetch, perPage = 5 }) {
+  const url = `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&orientation=portrait&per_page=${perPage}`;
+  const r = await fetchImpl(url, { headers: { Authorization: apiKey } });
+  if (!r.ok) return [];
+  const d = await r.json();
+  return (d.videos || [])
+    .map((v) => ({ link: pickPortraitVideo(v.video_files || []), id: String(v.id) }))
+    .filter((x) => x.link)
+    .map((x) => ({ type: "video", url: x.link, id: x.id }));
+}
+
+async function pixabayVideoCandidates(query, { apiKey, fetchImpl = fetch, perPage = 5 }) {
+  const url = `https://pixabay.com/api/videos/?key=${apiKey}&q=${encodeURIComponent(query)}&per_page=${perPage}`;
+  const r = await fetchImpl(url, {});
+  if (!r.ok) return [];
+  const d = await r.json();
+  return (d.hits || [])
+    .map((h) => ({ link: h.videos && (h.videos.large || h.videos.medium), id: String(h.id) }))
+    .filter((x) => x.link && x.link.url)
+    .map((x) => ({ type: "video", url: x.link.url, id: x.id }));
+}
+
+async function pixabayPhotoCandidates(query, { apiKey, fetchImpl = fetch, perPage = 5 }) {
+  const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&orientation=vertical&per_page=${perPage}`;
+  const r = await fetchImpl(url, {});
+  if (!r.ok) return [];
+  const d = await r.json();
+  return (d.hits || [])
+    .filter((h) => h.largeImageURL)
+    .map((h) => ({ type: "image", url: h.largeImageURL, id: String(h.id) }));
+}
+
+async function unsplashCandidates(query, { apiKey, fetchImpl = fetch, perPage = 5 }) {
+  const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&orientation=portrait&per_page=${perPage}&client_id=${apiKey}`;
+  const r = await fetchImpl(url, {});
+  if (!r.ok) return [];
+  const d = await r.json();
+  return (d.results || [])
+    .filter((h) => h.urls && h.urls.regular)
+    .map((h) => ({ type: "image", url: h.urls.regular, id: String(h.id) }));
+}
+
+module.exports = { pexels, pixabay, unsplash, pickPortraitVideo,
+  pexelsVideoCandidates, pixabayVideoCandidates, pixabayPhotoCandidates, unsplashCandidates };
