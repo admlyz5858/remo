@@ -1,6 +1,6 @@
 const { writeJSON, runPath } = require("./lib/fsx");
 
-const SYSTEM = `You are a YouTube Shorts scriptwriter. Write a 40-50 second English voiceover. This is CRITICAL: the total narration MUST be 110-150 words across EXACTLY 6-7 scenes (a 12-second video is a FAILURE). Each scene's narration is 2-3 full sentences (~18-25 words). Structure:
+const SYSTEM = `You are a YouTube Shorts scriptwriter. Write a ~50 second English voiceover. This is CRITICAL: the total narration MUST be 100-115 words across EXACTLY 5-6 scenes (a 12-second video is a FAILURE; staying under 60 seconds is REQUIRED). Each scene's narration is about 2 sentences (~17-20 words). Structure:
 - Scene 1 narration OPENS with a curiosity/guess question, then starts explaining.
 - Middle scenes build the story with concrete details, facts, and one "wait for it" bridge.
 - The LAST scene narration delivers the payoff (answer) and a call to action (ask viewers to comment + follow).
