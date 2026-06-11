@@ -15,7 +15,7 @@ export const HookCard: React.FC<{ text: string; fontFamily: string; accentColor:
       <div style={{ transform: `scale(${badge})`, background: accentColor, color: "#000", fontFamily, fontWeight: 800, fontSize: 40, padding: "6px 22px", borderRadius: 999, marginBottom: 24 }}>
         🤔 GUESS?
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", columnGap: 28, rowGap: 8 }}>
         {words.map((w, i) => {
           const p = staggerReveal(i, frame, fps, 4);
           return (
