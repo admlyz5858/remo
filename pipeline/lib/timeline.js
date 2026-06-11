@@ -11,20 +11,24 @@ function applyTimings(scenes, durationsSec) {
   return { scenes: out, total_duration_sec: Math.round(cursor * 1000) / 1000 };
 }
 
-function buildInputProps({ runId, scenesDoc, media, captions, theme, fps, seed, accentPalette, transitions, musicSrc, musicVolume }) {
+function buildInputProps({ runId, scenesDoc, media, captions, theme, fps, seed, accentPalette, transitions, musicSrc, musicVolume, annotations = [], sfxSrc = null }) {
   const byId = new Map(media.map((m) => [m.sceneId, m]));
+  const annById = new Map((annotations || []).map((a) => [a.sceneId, a]));
   const accentColor = pickFrom(seed, accentPalette);
   let frame = 0;
   const scenes = scenesDoc.scenes.map((s) => {
     const durationFrames = Math.round(s.duration_sec * fps);
     const m = byId.get(s.id);
+    const a = annById.get(s.id);
     const node = {
       id: s.id,
       onScreenText: s.on_screen_text || null,
+      emoji: s.emoji || null,
       startFrame: frame,
       durationFrames,
       media: m ? { type: m.type, src: `${runId}/${m.file}` } : { type: "image", src: "" },
       transition: pickFrom(`${seed}:${s.id}`, transitions),
+      annotation: a ? { box: a.box, label: a.label, type: a.type } : null,
     };
     frame += durationFrames;
     return node;
@@ -34,6 +38,11 @@ function buildInputProps({ runId, scenesDoc, media, captions, theme, fps, seed, 
     audioSrc: `${runId}/voiceover.mp3`,
     musicSrc: musicSrc || null,
     musicVolume,
+    sfxSrc: sfxSrc || null,
+    hookQuestion: scenesDoc.hook_question || null,
+    waitTeaser: scenesDoc.wait_teaser || null,
+    payoff: scenesDoc.payoff || null,
+    cta: scenesDoc.cta || null,
     theme: { ...theme, accentColor },
     captions, scenes,
   };

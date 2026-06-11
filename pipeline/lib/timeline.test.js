@@ -12,29 +12,45 @@ test("applyTimings sets cumulative ms windows and total", () => {
   assert.strictEqual(out.total_duration_sec, 5.0);
 });
 
-test("buildInputProps converts frames, seeds accent + transition, wires music", () => {
-  const scenesDoc = { scenes: [
-    { id: 1, on_screen_text: "A", duration_sec: 2.0 },
-    { id: 2, on_screen_text: null, duration_sec: 1.0 },
-  ]};
+test("buildInputProps emits hooks, emoji, annotation + sfx", () => {
+  const scenesDoc = {
+    hook_question: "Guess?", wait_teaser: "Wait...", payoff: "Answer!",
+    cta: "Comment + follow",
+    scenes: [
+      { id: 1, on_screen_text: "A", duration_sec: 2.0, emoji: "🐙" },
+      { id: 2, on_screen_text: null, duration_sec: 1.0, emoji: null },
+    ],
+  };
   const media = [ { sceneId: 1, type: "video", file: "scene_01.mp4" },
                   { sceneId: 2, type: "image", file: "scene_02.jpg" } ];
-  const transitions = ["slideLeft", "slideUp", "zoomIn", "fade"];
-  const accentPalette = ["#111111", "#222222", "#333333"];
+  const annotations = [{ sceneId: 1, box: { x: 0.5, y: 0.4, w: 0.2, h: 0.2 }, label: "heart", type: "circle" }];
   const props = buildInputProps({
-    runId: "r1", scenesDoc, media,
-    captions: [{ text: "hi", startMs: 0, endMs: 500, timestampMs: 250, confidence: 1 }],
-    theme: { accentColor: "#000000", fontFamily: "Anton", channelName: "@c" },
-    fps: 30, seed: "r1", accentPalette, transitions, musicSrc: "r1/music.mp3", musicVolume: 0.1,
+    runId: "r1", scenesDoc, media, captions: [],
+    theme: { accentColor: "#000", fontFamily: "Anton", channelName: "@c" },
+    fps: 30, seed: "r1", accentPalette: ["#111", "#222"], transitions: ["slideLeft", "fade"],
+    musicSrc: "r1/music.mp3", musicVolume: 0.1, annotations, sfxSrc: "r1/sfx.mp3",
   });
-  assert.strictEqual(props.scenes[0].durationFrames, 60);
-  assert.strictEqual(props.scenes[1].startFrame, 60);
-  assert.strictEqual(props.scenes[0].media.src, "r1/scene_01.mp4");
-  assert.strictEqual(props.audioSrc, "r1/voiceover.mp3");
-  assert.strictEqual(props.musicSrc, "r1/music.mp3");
-  assert.strictEqual(props.musicVolume, 0.1);
-  assert.ok(accentPalette.includes(props.theme.accentColor));
-  assert.ok(transitions.includes(props.scenes[0].transition));
+  assert.strictEqual(props.hookQuestion, "Guess?");
+  assert.strictEqual(props.waitTeaser, "Wait...");
+  assert.strictEqual(props.payoff, "Answer!");
+  assert.strictEqual(props.cta, "Comment + follow");
+  assert.strictEqual(props.sfxSrc, "r1/sfx.mp3");
+  assert.strictEqual(props.scenes[0].emoji, "🐙");
+  assert.strictEqual(props.scenes[1].emoji, null);
+  assert.deepStrictEqual(props.scenes[0].annotation, { box: { x: 0.5, y: 0.4, w: 0.2, h: 0.2 }, label: "heart", type: "circle" });
+  assert.strictEqual(props.scenes[1].annotation, null);
+});
+
+test("buildInputProps defaults annotations/sfx when omitted", () => {
+  const scenesDoc = { scenes: [{ id: 1, on_screen_text: null, duration_sec: 1.0 }] };
+  const props = buildInputProps({
+    runId: "r1", scenesDoc, media: [], captions: [],
+    theme: { accentColor: "#000", fontFamily: "Anton", channelName: "@c" },
+    fps: 30, seed: "r1", accentPalette: ["#111"], transitions: ["fade"],
+  });
+  assert.strictEqual(props.sfxSrc, null);
+  assert.strictEqual(props.scenes[0].annotation, null);
+  assert.strictEqual(props.hookQuestion, null);
 });
 
 test("assembleCaptions offsets per-scene word boundaries by scene start", () => {
