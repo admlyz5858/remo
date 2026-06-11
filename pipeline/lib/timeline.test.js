@@ -65,3 +65,33 @@ test("assembleCaptions offsets per-scene word boundaries by scene start", () => 
   assert.deepStrictEqual(caps[1], { text: "two", startMs: 400, endMs: 1000, timestampMs: 700, confidence: 1 });
   assert.deepStrictEqual(caps[2], { text: "three", startMs: 2000, endMs: 2500, timestampMs: 2250, confidence: 1 });
 });
+
+const { buildCommentsProps, parseUpvotes } = require("./timeline");
+
+test("parseUpvotes parses human strings to numbers", () => {
+  assert.strictEqual(parseUpvotes("12.4k"), 12400);
+  assert.strictEqual(parseUpvotes("999"), 999);
+  assert.strictEqual(parseUpvotes("2.1m"), 2100000);
+  assert.strictEqual(parseUpvotes(null), 0);
+});
+
+test("buildCommentsProps frames segments + wires background/sfx/accent", () => {
+  const deck = {
+    subreddit: "AskReddit", question: "Q?",
+    segments: [
+      { kind: "question", author: null, upvotes: null, text: "Q?", duration_sec: 2.0 },
+      { kind: "comment", author: "u/a", upvotes: "1k", text: "c1", duration_sec: 1.0 },
+    ],
+  };
+  const props = buildCommentsProps({
+    runId: "r1", deck, captions: [], theme: { accentColor: "#000", fontFamily: "Anton", channelName: "@h" },
+    fps: 30, seed: "r1", accentPalette: ["#111", "#222"], musicSrc: "r1/music.mp3", musicVolume: 0.1, sfxSrc: "r1/sfx.mp3", backgroundSrc: "r1/bg.mp4",
+  });
+  assert.strictEqual(props.backgroundSrc, "r1/bg.mp4");
+  assert.strictEqual(props.subreddit, "AskReddit");
+  assert.strictEqual(props.segments[0].startFrame, 0);
+  assert.strictEqual(props.segments[0].durationFrames, 60);
+  assert.strictEqual(props.segments[1].startFrame, 60);
+  assert.strictEqual(props.segments[1].durationFrames, 30);
+  assert.ok(["#111", "#222"].includes(props.theme.accentColor));
+});
