@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, Sequence, Audio, staticFile } from "remotion";
+import { AbsoluteFill, Sequence, staticFile } from "remotion";
+import { Audio } from "@remotion/media";
 import { loadFont } from "@remotion/google-fonts/Anton";
 import { Scene } from "./components/Scene";
 import { OnScreenText } from "./components/OnScreenText";

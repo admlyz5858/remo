@@ -18,6 +18,8 @@ async function probeDuration(file) {
 async function concat(files, out) {
   const listFile = out + ".txt";
   require("node:fs").writeFileSync(listFile, files.map((f) => `file '${require("node:path").resolve(f)}'`).join("\n"));
-  await run("ffmpeg", ["-y", "-f", "concat", "-safe", "0", "-i", listFile, "-c", "copy", out]);
+  // Re-encode (not -c copy): stream-copying independently-encoded edge-tts MP3s
+  // causes duration drift that desyncs captions/progress from the voice track.
+  await run("ffmpeg", ["-y", "-f", "concat", "-safe", "0", "-i", listFile, "-c:a", "libmp3lame", "-b:a", "192k", out]);
 }
 module.exports = { run, synth, probeDuration, concat };
