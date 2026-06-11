@@ -5,7 +5,8 @@ import { shortSchema, type ShortProps } from "./schema";
 
 const defaultProps: ShortProps = {
   fps: 30, width: 1080, height: 1920,
-  audioSrc: "", theme: { accentColor: "#FFD400", fontFamily: "Anton", channelName: "@channel" },
+  audioSrc: "", musicSrc: null, musicVolume: 0.1,
+  theme: { accentColor: "#FFD400", fontFamily: "Anton", channelName: "@channel" },
   captions: [], scenes: [],
 };
 
