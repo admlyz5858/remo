@@ -3,9 +3,11 @@ const { synthSegments } = require("./lib/voiceover-core");
 
 async function makeCommentsVoiceover({ runId, runRoot, voice, rate, deps }) {
   const deck = readJSON(runPath(runRoot, runId, "deck.json"));
+  const CTA = "Comment your favorite below, and follow for more!";
   const segments = [
     { id: 1, narration: deck.question, kind: "question", author: null, upvotes: null, text: deck.question },
     ...deck.comments.map((c, i) => ({ id: i + 2, narration: c.text, kind: "comment", author: c.author, upvotes: c.upvotes, text: c.text })),
+    { id: deck.comments.length + 2, narration: CTA, kind: "cta", author: null, upvotes: null, text: CTA },
   ];
   const audioDir = runPath(runRoot, runId, "audio");
   const { timed, captions } = await synthSegments({ segments, audioDir, voice, rate, deps });

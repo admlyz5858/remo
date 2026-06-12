@@ -53,7 +53,7 @@ export type SceneNode = z.infer<typeof sceneSchema>;
 export type CaptionItem = z.infer<typeof captionSchema>;
 
 export const segmentSchema = z.object({
-  kind: z.enum(["question", "comment"]),
+  kind: z.enum(["question", "comment", "cta"]),
   author: z.string().nullable(),
   upvotes: z.string().nullable(),
   text: z.string(),

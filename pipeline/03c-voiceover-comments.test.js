@@ -16,10 +16,12 @@ test("makeCommentsVoiceover voices question+comments, writes timed deck + captio
     concat: async (_f, out) => fs.writeFileSync(out, "j"),
   };
   const deck = await makeCommentsVoiceover({ runId: "r1", runRoot, voice: "v", rate: "+8%", deps });
-  assert.strictEqual(deck.total_duration_sec, 4.5);
-  assert.strictEqual(deck.segments.length, 3);
+  // question + 2 comments + cta = 4 segments
+  assert.strictEqual(deck.total_duration_sec, 6.0);
+  assert.strictEqual(deck.segments.length, 4);
   assert.strictEqual(deck.segments[0].kind, "question");
   assert.strictEqual(deck.segments[1].kind, "comment");
+  assert.strictEqual(deck.segments[3].kind, "cta");
   assert.ok(fs.existsSync(path.join(runRoot, "r1", "captions.json")));
   assert.ok(fs.existsSync(path.join(runRoot, "r1", "audio", "voiceover.mp3")));
 });
