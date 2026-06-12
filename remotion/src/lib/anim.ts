@@ -60,3 +60,38 @@ export function dashOffsetFor(length: number, p: number): number {
 export function boxToScreen(box: { x: number; y: number; w: number; h: number }, W: number, H: number) {
   return { cx: box.x * W, cy: box.y * H, w: box.w * W, h: box.h * H };
 }
+
+export function parseStat(s: string): { prefix: string; num: number; suffix: string } {
+  const m = String(s).trim().match(/^([^0-9.]*)([\d.,]+)\s*([kmb]?)\s*(%?)/i);
+  if (!m) return { prefix: "", num: 0, suffix: "" };
+  const prefix = m[1] || "";
+  const num = parseFloat(m[2].replace(/,/g, "")) || 0;
+  const unit = (m[3] || "").toLowerCase();
+  const scale = unit === "k" ? 1e3 : unit === "m" ? 1e6 : unit === "b" ? 1e9 : 1;
+  return { prefix, num: Math.round(num * scale), suffix: m[4] || "" };
+}
+
+export function countValue(target: number, p: number): number {
+  const t = Math.min(Math.max(p, 0), 1);
+  const eased = 1 - Math.pow(1 - t, 3);
+  return Math.round(target * eased);
+}
+
+export function formatCount(n: number): string {
+  return Math.round(n).toLocaleString("en-US");
+}
+
+// points -> "M x0 y0 L x1 y1 ..." normalized to width w, height h (y inverted; min->bottom, max->top)
+export function chartPath(points: number[], w: number, h: number): string {
+  if (!points.length) return "";
+  const min = Math.min(...points), max = Math.max(...points);
+  const span = max - min || 1;
+  const step = points.length > 1 ? w / (points.length - 1) : 0;
+  return points
+    .map((v, i) => {
+      const x = Math.round(i * step);
+      const y = Math.round(h - ((v - min) / span) * h);
+      return `${i === 0 ? "M" : "L"} ${x} ${y}`;
+    })
+    .join(" ");
+}

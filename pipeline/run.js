@@ -53,6 +53,35 @@ async function main() {
     return;
   }
 
+  if (cfg.mode === "money") {
+    const { pickMoneyTopic } = require("./01m-topic");
+    const { writeMoneyScript } = require("./02m-script");
+    const { renderMoney } = require("./06-render");
+    const { findMediaCandidates } = require("./lib/stock");
+    let topic;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      topic = await pickMoneyTopic({ runId, runRoot, history, chat });
+      if (!isDuplicate(history, topic.slug)) break;
+    }
+    await writeMoneyScript({ runId, runRoot, topic, chat });
+    const voDeps = { synth: sh.synth, probeDuration: sh.probeDuration, concat: sh.concat };
+    await makeVoiceover({ runId, runRoot, voice: cfg.voice, rate: cfg.ttsRate, deps: voDeps });
+    const provFns = {
+      pexelsVideo: (q) => providers.pexelsVideoCandidates(q, { apiKey: process.env.PEXELS_API_KEY }),
+      pixabayVideo: (q) => providers.pixabayVideoCandidates(q, { apiKey: process.env.PIXABAY_API_KEY }),
+      pixabayPhoto: (q) => providers.pixabayPhotoCandidates(q, { apiKey: process.env.PIXABAY_API_KEY }),
+      unsplash: (q) => providers.unsplashCandidates(q, { apiKey: process.env.UNSPLASH_API_KEY }),
+    };
+    const find = (q) => findMediaCandidates(q, cfg.mediaOrder, provFns);
+    await fetchSceneMedia({ runId, runRoot, pubRoot: "remotion/public", find, download });
+    const outFile = `out/${runId}.mp4`;
+    await renderMoney({ runId, runRoot, pubRoot: "remotion/public", theme: { ...cfg.theme, accentColor: cfg.niches.money.accentPalette[0], channelName: cfg.niches.money.channelName }, fps: cfg.render.fps, outFile });
+    const nextHistory = addEntry(history, { mode: "money", slug: topic.slug, topic: topic.topic, status: "pending", runId });
+    writeJSON(historyPath, nextHistory);
+    console.log(JSON.stringify({ runId, mode: "money", topic: topic.topic, outFile }));
+    return;
+  }
+
   let topic;
   for (let attempt = 0; attempt < 3; attempt++) {
     topic = await pickTopic({ runId, runRoot, history, chat });

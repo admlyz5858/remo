@@ -70,3 +70,20 @@ test("prepareCommentsRender copies audio + builds comments props", () => {
   assert.strictEqual(props.segments[1].durationFrames, 30);
   assert.strictEqual(fs.readFileSync(path.join(pubRoot, "r1", "voiceover.mp3"), "utf8"), "AUDIO");
 });
+
+const { prepareMoneyRender } = require("./06-render");
+
+test("prepareMoneyRender builds money props with stat/chart", () => {
+  const runRoot = fs.mkdtempSync(path.join(os.tmpdir(), "mr-"));
+  const pubRoot = fs.mkdtempSync(path.join(os.tmpdir(), "mpub-"));
+  const dir = path.join(runRoot, "r1"); fs.mkdirSync(path.join(dir, "audio"), { recursive: true });
+  fs.mkdirSync(path.join(pubRoot, "r1"), { recursive: true });
+  fs.writeFileSync(path.join(dir, "audio", "voiceover.mp3"), "AUDIO");
+  fs.writeFileSync(path.join(dir, "captions.json"), JSON.stringify([]));
+  fs.writeFileSync(path.join(dir, "media.json"), JSON.stringify([{ sceneId: 1, type: "video", file: "scene_01.mp4" }]));
+  fs.writeFileSync(path.join(dir, "scenes.json"), JSON.stringify({ scenes: [{ id: 1, on_screen_text: "A", duration_sec: 2.0, stat: { value: "$1M", label: "x" }, chart: [1, 2, 3] }], total_duration_sec: 2.0 }));
+  const props = prepareMoneyRender({ runId: "r1", runRoot, pubRoot, theme: { accentColor: "#16C784", fontFamily: "Anton", channelName: "@FunHoney" }, fps: 30, seed: "r1", accentPalette: ["#16C784"], transitions: ["fade"], musicDir: path.join(runRoot, "no"), musicVolume: 0.1, sfxDir: path.join(runRoot, "no") });
+  assert.deepStrictEqual(props.scenes[0].stat, { value: "$1M", label: "x" });
+  assert.deepStrictEqual(props.scenes[0].chart, [1, 2, 3]);
+  assert.strictEqual(fs.readFileSync(path.join(pubRoot, "r1", "voiceover.mp3"), "utf8"), "AUDIO");
+});

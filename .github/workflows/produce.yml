@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "facts or comments"
+        description: "facts, comments, or money"
         required: false
         default: "facts"
 
@@ -54,7 +54,7 @@ jobs:
           YT_COMMENTS_REFRESH_TOKEN: ${{ secrets.YT_COMMENTS_REFRESH_TOKEN }}
         run: |
           ID=${{ steps.runid.outputs.id }}
-          if [ "${{ inputs.mode }}" = "comments" ]; then RT=YT_COMMENTS_REFRESH_TOKEN; else RT=YOUTUBE_REFRESH_TOKEN; fi
+          if [ "${{ inputs.mode }}" = "facts" ]; then RT=YOUTUBE_REFRESH_TOKEN; else RT=YT_COMMENTS_REFRESH_TOKEN; fi
           python scripts/upload_youtube.py upload \
             --video out/$ID.mp4 \
             --meta run/$ID/meta.json \

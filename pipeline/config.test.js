@@ -29,3 +29,8 @@ test("config has mode + comments settings", () => {
   assert.strictEqual(cfg.gameplay.dir, "remotion/public/gameplay");
   assert.strictEqual(cfg.commentsTokenEnv, "YT_COMMENTS_REFRESH_TOKEN");
 });
+
+test("config has money niche (accent + channel)", () => {
+  assert.ok(Array.isArray(cfg.niches.money.accentPalette) && cfg.niches.money.accentPalette.length >= 2);
+  assert.strictEqual(cfg.niches.money.channelName, "@FunHoney");
+});

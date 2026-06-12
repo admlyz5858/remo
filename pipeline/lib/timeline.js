@@ -88,4 +88,13 @@ function buildCommentsProps({ runId, deck, captions, theme, fps, seed, accentPal
   };
 }
 
-module.exports = { applyTimings, buildInputProps, assembleCaptions, buildCommentsProps, parseUpvotes };
+function buildMoneyProps(args) {
+  const base = buildInputProps(args);
+  const byId = new Map(args.scenesDoc.scenes.map((s) => [s.id, s]));
+  base.scenes = base.scenes.map((node) => {
+    const s = byId.get(node.id) || {};
+    return { ...node, stat: s.stat || null, chart: Array.isArray(s.chart) ? s.chart : null };
+  });
+  return base;
+}
+module.exports = { applyTimings, buildInputProps, assembleCaptions, buildCommentsProps, parseUpvotes, buildMoneyProps };
