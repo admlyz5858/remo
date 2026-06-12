@@ -10,7 +10,7 @@ on:
         required: true
         default: "approve"
       channel:
-        description: "facts (DustMust) or comments (Fun Honey)"
+        description: "facts (DustMust) or funhoney (comments/money)"
         required: false
         default: "facts"
 
@@ -33,7 +33,7 @@ jobs:
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
           YT_COMMENTS_REFRESH_TOKEN: ${{ secrets.YT_COMMENTS_REFRESH_TOKEN }}
         run: |
-          if [ "${{ inputs.channel }}" = "comments" ]; then RT=YT_COMMENTS_REFRESH_TOKEN; else RT=YOUTUBE_REFRESH_TOKEN; fi
+          if [ "${{ inputs.channel }}" = "facts" ]; then RT=YOUTUBE_REFRESH_TOKEN; else RT=YT_COMMENTS_REFRESH_TOKEN; fi
           if [ "${{ inputs.action }}" = "approve" ]; then
             python scripts/upload_youtube.py publish --video-id "${{ inputs.video_id }}" --refresh-token-env $RT
           else
