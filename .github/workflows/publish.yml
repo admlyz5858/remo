@@ -9,6 +9,10 @@ on:
         description: "approve or reject"
         required: true
         default: "approve"
+      channel:
+        description: "facts (DustMust) or comments (Fun Honey)"
+        required: false
+        default: "facts"
 
 permissions:
   contents: write
@@ -27,11 +31,13 @@ jobs:
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YT_COMMENTS_REFRESH_TOKEN: ${{ secrets.YT_COMMENTS_REFRESH_TOKEN }}
         run: |
+          if [ "${{ inputs.channel }}" = "comments" ]; then RT=YT_COMMENTS_REFRESH_TOKEN; else RT=YOUTUBE_REFRESH_TOKEN; fi
           if [ "${{ inputs.action }}" = "approve" ]; then
-            python scripts/upload_youtube.py publish --video-id "${{ inputs.video_id }}"
+            python scripts/upload_youtube.py publish --video-id "${{ inputs.video_id }}" --refresh-token-env $RT
           else
-            python scripts/upload_youtube.py delete --video-id "${{ inputs.video_id }}"
+            python scripts/upload_youtube.py delete --video-id "${{ inputs.video_id }}" --refresh-token-env $RT
           fi
       - name: Update history status
         run: |
