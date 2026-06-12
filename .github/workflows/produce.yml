@@ -6,6 +6,10 @@ on:
         description: "facts, comments, or money"
         required: false
         default: "facts"
+  schedule:
+    # 2 facts videos/day on DustMust, auto-published (times are UTC).
+    - cron: "0 9 * * *"   # ~12:00 Türkiye
+    - cron: "0 17 * * *"  # ~20:00 Türkiye
 
 permissions:
   contents: write
@@ -34,7 +38,7 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          MODE: ${{ inputs.mode }}
+          MODE: ${{ inputs.mode || 'facts' }}
           REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: node pipeline/run.js
@@ -46,7 +50,7 @@ jobs:
         with:
           name: short-${{ steps.runid.outputs.id }}
           path: out/${{ steps.runid.outputs.id }}.mp4
-      - name: Upload to YouTube (private)
+      - name: Upload to YouTube
         env:
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
@@ -54,18 +58,22 @@ jobs:
           YT_COMMENTS_REFRESH_TOKEN: ${{ secrets.YT_COMMENTS_REFRESH_TOKEN }}
         run: |
           ID=${{ steps.runid.outputs.id }}
-          if [ "${{ inputs.mode }}" = "facts" ]; then RT=YOUTUBE_REFRESH_TOKEN; else RT=YT_COMMENTS_REFRESH_TOKEN; fi
+          MODE="${{ inputs.mode || 'facts' }}"
+          if [ "$MODE" = "facts" ]; then RT=YOUTUBE_REFRESH_TOKEN; else RT=YT_COMMENTS_REFRESH_TOKEN; fi
+          # Scheduled (cron) runs auto-publish to public; manual dispatch stays private for review.
+          if [ "${{ github.event_name }}" = "schedule" ]; then PRIV=public; else PRIV=private; fi
+          echo "mode=$MODE privacy=$PRIV token=$RT"
           python scripts/upload_youtube.py upload \
             --video out/$ID.mp4 \
             --meta run/$ID/meta.json \
-            --privacy private \
+            --privacy $PRIV \
             --refresh-token-env $RT \
             --out run/$ID/upload.json
           cat run/$ID/upload.json
       - name: Persist upload result + history
         run: |
           ID=${{ steps.runid.outputs.id }}
-          node -e "const fs=require('fs');const u=require('./run/'+process.env.ID+'/upload.json');const h=require('./state/history.json');const e=h.entries.find(x=>x.runId===process.env.ID);if(e){e.video_id=u.video_id;e.url=u.url;}fs.writeFileSync('state/history.json',JSON.stringify(h,null,2));"
+          node -e "const fs=require('fs');const u=require('./run/'+process.env.ID+'/upload.json');const h=require('./state/history.json');const e=h.entries.find(x=>x.runId===process.env.ID);if(e){e.video_id=u.video_id;e.url=u.url;if(u.privacy==='public')e.status='published';}fs.writeFileSync('state/history.json',JSON.stringify(h,null,2));"
         env: { ID: "${{ steps.runid.outputs.id }}" }
       - name: Commit state
         run: |
