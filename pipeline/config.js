@@ -16,4 +16,5 @@ module.exports = {
   subreddits: ["AskReddit", "Showerthoughts", "AskReddit", "tifu"],
   gameplay: { dir: "remotion/public/gameplay" },
   commentsTokenEnv: "YT_COMMENTS_REFRESH_TOKEN",
+  commentsChannelName: "@FunHoney",
 };
