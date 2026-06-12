@@ -69,3 +69,28 @@ test("boxToScreen maps normalized center+size to px", () => {
   assert.strictEqual(r.w, 200);
   assert.strictEqual(r.h, 200);
 });
+
+import { parseStat, countValue, formatCount, chartPath } from "./anim";
+
+test("parseStat splits prefix/number/suffix and scales k/m", () => {
+  assert.deepStrictEqual(parseStat("$1,000,000"), { prefix: "$", num: 1000000, suffix: "" });
+  assert.deepStrictEqual(parseStat("$1.2M"), { prefix: "$", num: 1200000, suffix: "" });
+  assert.deepStrictEqual(parseStat("340%"), { prefix: "", num: 340, suffix: "%" });
+  assert.deepStrictEqual(parseStat("50k"), { prefix: "", num: 50000, suffix: "" });
+});
+
+test("countValue eases 0..target", () => {
+  assert.strictEqual(countValue(100, 0), 0);
+  assert.strictEqual(countValue(100, 1), 100);
+  assert.ok(countValue(100, 0.5) > 50);
+});
+
+test("formatCount groups thousands", () => {
+  assert.strictEqual(formatCount(1000000), "1,000,000");
+  assert.strictEqual(formatCount(340), "340");
+});
+
+test("chartPath maps points into an SVG polyline", () => {
+  const p = chartPath([0, 10], 100, 50);
+  assert.match(p, /^M 0 50 L 100 0$/);
+});
