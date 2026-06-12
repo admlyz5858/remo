@@ -46,7 +46,7 @@ async function main() {
     }))[0] || null;
     await fetchBackground({ runId, pubRoot: "remotion/public", seed: runId, gameplayDir: cfg.gameplay.dir, find: bgFind, download });
     const outFile = `out/${runId}.mp4`;
-    await renderComments({ runId, runRoot, pubRoot: "remotion/public", theme: cfg.theme, fps: cfg.render.fps, outFile });
+    await renderComments({ runId, runRoot, pubRoot: "remotion/public", theme: { ...cfg.theme, channelName: cfg.commentsChannelName }, fps: cfg.render.fps, outFile });
     const nextHistory = addEntry(history, { mode: "comments", slug: `reddit-${runId}`, topic: "reddit", status: "pending", runId });
     writeJSON(historyPath, nextHistory);
     console.log(JSON.stringify({ runId, mode: "comments", outFile }));
