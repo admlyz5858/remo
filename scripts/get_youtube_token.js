@@ -18,6 +18,7 @@ const fs = require("node:fs");
 const { execFileSync } = require("node:child_process");
 
 const REPO = process.env.REMO_REPO || "admlyz5858/remo";
+const SECRET = process.env.REMO_TOKEN_SECRET || "YOUTUBE_REFRESH_TOKEN";
 const PORT = 8765;
 const REDIRECT = `http://localhost:${PORT}`;
 const SCOPE = "https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube";
@@ -93,12 +94,12 @@ const server = http.createServer(async (req, res) => {
       channelTitle = ch.items?.[0]?.snippet?.title || channelTitle;
     } catch { /* non-fatal */ }
 
-    execFileSync("gh", ["secret", "set", "YOUTUBE_REFRESH_TOKEN", "--repo", REPO, "--body", tok.refresh_token],
+    execFileSync("gh", ["secret", "set", SECRET, "--repo", REPO, "--body", tok.refresh_token],
       { stdio: ["ignore", "ignore", "inherit"] });
 
     res.end(`Authorized channel: ${channelTitle}. Token saved. You can close this tab.`);
     console.log(`\n✅ Authorized channel: ${channelTitle}`);
-    console.log(`✅ YOUTUBE_REFRESH_TOKEN secret updated on ${REPO} (token not printed).\n`);
+    console.log(`✅ ${SECRET} secret updated on ${REPO} (token not printed).\n`);
     server.close();
     process.exit(0);
   } catch (e) {
