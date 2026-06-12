@@ -8,7 +8,7 @@ export const CommentsEndCard: React.FC<{ channel: string; fontFamily: string; ac
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", opacity: o }}>
       <div style={{ fontFamily, fontWeight: 800, fontSize: 64, color: "white", textAlign: "center", WebkitTextStroke: "4px black", paintOrder: "stroke fill", marginBottom: 24 }}>Comment your favorite! 💬</div>
-      <div style={{ transform: `scale(${pulse})`, background: "#FF0033", color: "white", fontFamily, fontWeight: 800, fontSize: 46, padding: "12px 40px", borderRadius: 999 }}>▶ FOLLOW for daily Reddit</div>
+      <div style={{ transform: `scale(${pulse})`, background: "#FF0033", color: "white", fontFamily, fontWeight: 800, fontSize: 46, padding: "12px 40px", borderRadius: 999 }}>▶ FOLLOW for more 😂</div>
       <div style={{ fontFamily, fontSize: 38, color: "white", marginTop: 18, opacity: 0.9 }}>{channel}</div>
     </AbsoluteFill>
   );
