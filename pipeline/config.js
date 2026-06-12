@@ -17,4 +17,10 @@ module.exports = {
   gameplay: { dir: "remotion/public/gameplay" },
   commentsTokenEnv: "YT_COMMENTS_REFRESH_TOKEN",
   commentsChannelName: "@FunHoney",
+  niches: {
+    money: {
+      accentPalette: ["#16C784", "#F0B90B", "#2EBD85", "#FFD700"],
+      channelName: "@FunHoney",
+    },
+  },
 };
