@@ -95,3 +95,23 @@ test("buildCommentsProps frames segments + wires background/sfx/accent", () => {
   assert.strictEqual(props.segments[1].durationFrames, 30);
   assert.ok(["#111", "#222"].includes(props.theme.accentColor));
 });
+
+const { buildMoneyProps } = require("./timeline");
+
+test("buildMoneyProps = buildInputProps + per-scene stat/chart", () => {
+  const scenesDoc = { scenes: [
+    { id: 1, on_screen_text: "A", duration_sec: 2.0, stat: { value: "$1M", label: "x" }, chart: [1, 2, 3] },
+    { id: 2, on_screen_text: null, duration_sec: 1.0, stat: null, chart: null },
+  ]};
+  const media = [{ sceneId: 1, type: "video", file: "scene_01.mp4" }, { sceneId: 2, type: "image", file: "scene_02.jpg" }];
+  const props = buildMoneyProps({
+    runId: "r1", scenesDoc, media, captions: [],
+    theme: { accentColor: "#000", fontFamily: "Anton", channelName: "@f" },
+    fps: 30, seed: "r1", accentPalette: ["#16C784", "#F0B90B"], transitions: ["slideLeft", "fade"],
+  });
+  assert.deepStrictEqual(props.scenes[0].stat, { value: "$1M", label: "x" });
+  assert.deepStrictEqual(props.scenes[0].chart, [1, 2, 3]);
+  assert.strictEqual(props.scenes[1].stat, null);
+  assert.strictEqual(props.scenes[0].durationFrames, 60);
+  assert.ok(["#16C784", "#F0B90B"].includes(props.theme.accentColor));
+});
