@@ -73,3 +73,16 @@ export const commentsSchema = z.object({
 });
 export type CommentsProps = z.infer<typeof commentsSchema>;
 export type Segment = z.infer<typeof segmentSchema>;
+
+export const statSchema = z.object({ value: z.string(), label: z.string() });
+
+export const moneySceneSchema = sceneSchema.extend({
+  stat: statSchema.nullable(),
+  chart: z.array(z.number()).nullable(),
+});
+
+export const moneySchema = shortSchema.extend({
+  scenes: z.array(moneySceneSchema),
+});
+export type MoneyProps = z.infer<typeof moneySchema>;
+export type MoneyScene = z.infer<typeof moneySceneSchema>;
