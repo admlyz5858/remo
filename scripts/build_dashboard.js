@@ -41,7 +41,8 @@ async function fetchStats(videoIds, apiKey, fetchImpl = fetch) {
       if (!r.ok) continue;
       const d = await r.json();
       for (const it of d.items || []) {
-        out[it.id] = { views: Number(it.statistics.viewCount || 0), likes: Number(it.statistics.likeCount || 0) };
+        const st = it.statistics || {};
+        out[it.id] = { views: Number(st.viewCount || 0), likes: Number(st.likeCount || 0) };
       }
     } catch (_) { /* best-effort */ }
   }
