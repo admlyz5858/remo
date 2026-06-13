@@ -28,6 +28,8 @@ Produce comments: `gh workflow run produce.yml -f mode=comments`
 ## Dashboard
 | Secret | Purpose |
 |---|---|
-| DASHBOARD_DEPLOY_TOKEN | PAT with write access to the public `remo-dashboard` repo (pushes dashboard.json) |
+| DASHBOARD_DEPLOY_KEY | SSH private key (ed25519) for the write deploy key on the public `remo-dashboard` repo. `dashboard.yml` uses it to push `dashboard.json`. Auto-provisioned during setup — the matching public key is registered as a write deploy key on `remo-dashboard`; no manual PAT needed. |
 
-The dashboard's "Produce" button uses a SEPARATE PAT stored in your browser (Actions write on remo), never committed.
+The dashboard's "Produce" button uses a SEPARATE fine-grained PAT stored only in your browser (localStorage `ghpat`, Actions:write on `remo`), never committed. This is the only token you must create by hand — paste it via the ⚙️ button on the dashboard.
+
+Dashboard URL: https://admlyz5858.github.io/remo-dashboard/
