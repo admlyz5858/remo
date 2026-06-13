@@ -6,10 +6,21 @@ on:
         description: "facts, comments, or money"
         required: false
         default: "facts"
+      privacy:
+        description: "private or public (manual runs)"
+        required: false
+        default: "private"
+      publish_at:
+        description: "RFC3339 time to auto-publish, e.g. 2026-06-14T09:00:00Z (optional)"
+        required: false
+        default: ""
   schedule:
-    # 2 facts videos/day on DustMust, auto-published (times are UTC).
-    - cron: "0 9 * * *"   # ~12:00 Türkiye
-    - cron: "0 17 * * *"  # ~20:00 Türkiye
+    # 2 facts (DustMust) + 2 money (Fun Honey) per day, auto-published, staggered
+    # so no two publish at the same time (times are UTC; TR = UTC+3).
+    - cron: "0 9 * * *"    # facts (DustMust)  12:00 Türkiye
+    - cron: "0 11 * * *"   # money (Fun Honey) 14:00 Türkiye
+    - cron: "0 15 * * *"   # facts (DustMust)  18:00 Türkiye
+    - cron: "0 17 * * *"   # money (Fun Honey) 20:00 Türkiye
 
 permissions:
   contents: write
@@ -31,6 +42,22 @@ jobs:
         run: npm install
       - name: Install Remotion deps
         run: cd remotion && npm install
+      - name: Resolve mode + privacy
+        id: cfg
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            case "${{ github.event.schedule }}" in
+              "0 11 * * *"|"0 17 * * *") M=money ;;
+              *) M=facts ;;
+            esac
+            P=public
+          else
+            M="${{ inputs.mode || 'facts' }}"
+            P="${{ inputs.privacy || 'private' }}"
+          fi
+          echo "mode=$M" >> "$GITHUB_OUTPUT"
+          echo "privacy=$P" >> "$GITHUB_OUTPUT"
+          echo "Resolved mode=$M privacy=$P"
       - name: Run pipeline (topic -> render)
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -38,7 +65,7 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          MODE: ${{ inputs.mode || 'facts' }}
+          MODE: ${{ steps.cfg.outputs.mode }}
           REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: node pipeline/run.js
@@ -58,16 +85,19 @@ jobs:
           YT_COMMENTS_REFRESH_TOKEN: ${{ secrets.YT_COMMENTS_REFRESH_TOKEN }}
         run: |
           ID=${{ steps.runid.outputs.id }}
-          MODE="${{ inputs.mode || 'facts' }}"
+          MODE="${{ steps.cfg.outputs.mode }}"
+          PRIV="${{ steps.cfg.outputs.privacy }}"
+          PUBAT="${{ inputs.publish_at }}"
           if [ "$MODE" = "facts" ]; then RT=YOUTUBE_REFRESH_TOKEN; else RT=YT_COMMENTS_REFRESH_TOKEN; fi
-          # Scheduled (cron) runs auto-publish to public; manual dispatch stays private for review.
-          if [ "${{ github.event_name }}" = "schedule" ]; then PRIV=public; else PRIV=private; fi
-          echo "mode=$MODE privacy=$PRIV token=$RT"
+          EXTRA=""
+          if [ -n "$PUBAT" ]; then EXTRA="--publish-at $PUBAT"; fi
+          echo "mode=$MODE privacy=$PRIV token=$RT publishAt=$PUBAT"
           python scripts/upload_youtube.py upload \
             --video out/$ID.mp4 \
             --meta run/$ID/meta.json \
             --privacy $PRIV \
             --refresh-token-env $RT \
+            $EXTRA \
             --out run/$ID/upload.json
           cat run/$ID/upload.json
       - name: Persist upload result + history
