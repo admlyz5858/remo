@@ -24,3 +24,10 @@ Reject:   `gh workflow run publish.yml -f video_id=<ID> -f action=reject`
 | YT_COMMENTS_REFRESH_TOKEN | refresh token for the SECOND channel (authorize via scripts/get_youtube_token.js) |
 
 Produce comments: `gh workflow run produce.yml -f mode=comments`
+
+## Dashboard
+| Secret | Purpose |
+|---|---|
+| DASHBOARD_DEPLOY_TOKEN | PAT with write access to the public `remo-dashboard` repo (pushes dashboard.json) |
+
+The dashboard's "Produce" button uses a SEPARATE PAT stored in your browser (Actions write on remo), never committed.

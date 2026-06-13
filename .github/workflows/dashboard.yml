@@ -1,0 +1,36 @@
+name: dashboard
+on:
+  schedule:
+    - cron: "0 * * * *"   # hourly
+  workflow_run:
+    workflows: ["produce", "publish"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: Build dashboard.json
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          OUT: dashboard.json
+        run: node scripts/build_dashboard.js
+      - name: Push to dashboard repo
+        env:
+          GH_TOKEN: ${{ secrets.DASHBOARD_DEPLOY_TOKEN }}
+        run: |
+          git clone --depth 1 https://x-access-token:${GH_TOKEN}@github.com/admlyz5858/remo-dashboard.git dash
+          cp dashboard.json dash/dashboard.json
+          cd dash
+          git config user.name "remo-bot"
+          git config user.email "bot@remo"
+          git add dashboard.json
+          git commit -m "data: refresh dashboard $(date -u +%FT%TZ)" || echo "no change"
+          git push || echo "push skipped"
