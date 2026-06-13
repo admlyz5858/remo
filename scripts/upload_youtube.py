@@ -26,6 +26,11 @@ def service(refresh_env="YOUTUBE_REFRESH_TOKEN"):
 def cmd_upload(a):
     meta = json.load(open(a.meta))
     yt = service(a.refresh_token_env)
+    status = {"privacyStatus": a.privacy, "selfDeclaredMadeForKids": False}
+    # Scheduled publish: YouTube requires privacyStatus=private + a future publishAt (RFC3339).
+    if getattr(a, "publish_at", None):
+        status["privacyStatus"] = "private"
+        status["publishAt"] = a.publish_at
     body = {
         "snippet": {
             "title": meta["title"][:100],
@@ -33,14 +38,14 @@ def cmd_upload(a):
             "tags": meta.get("tags", []),
             "categoryId": str(meta.get("category_id", 27)),
         },
-        "status": {"privacyStatus": a.privacy, "selfDeclaredMadeForKids": False},
+        "status": status,
     }
     media = MediaFileUpload(a.video, chunksize=-1, resumable=True)
     req = yt.videos().insert(part="snippet,status", body=body, media_body=media)
     resp = None
     while resp is None:
         _, resp = req.next_chunk()
-    out = {"video_id": resp["id"], "url": f"https://youtu.be/{resp['id']}", "privacy": a.privacy}
+    out = {"video_id": resp["id"], "url": f"https://youtu.be/{resp['id']}", "privacy": status["privacyStatus"], "publish_at": getattr(a, "publish_at", None)}
     json.dump(out, open(a.out, "w"), indent=2)
     print(json.dumps(out))
 
@@ -59,6 +64,7 @@ def main():
     sub = p.add_subparsers(dest="cmd", required=True)
     u = sub.add_parser("upload"); u.add_argument("--video", required=True); u.add_argument("--meta", required=True)
     u.add_argument("--privacy", default="private"); u.add_argument("--out", required=True)
+    u.add_argument("--publish-at", default=None)  # RFC3339, e.g. 2026-06-14T09:00:00Z (schedules public)
     u.add_argument("--refresh-token-env", default="YOUTUBE_REFRESH_TOKEN"); u.set_defaults(fn=cmd_upload)
     pub = sub.add_parser("publish"); pub.add_argument("--video-id", required=True)
     pub.add_argument("--refresh-token-env", default="YOUTUBE_REFRESH_TOKEN"); pub.set_defaults(fn=cmd_publish)

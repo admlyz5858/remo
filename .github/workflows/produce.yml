@@ -10,6 +10,10 @@ on:
         description: "private or public (manual runs)"
         required: false
         default: "private"
+      publish_at:
+        description: "RFC3339 time to auto-publish, e.g. 2026-06-14T09:00:00Z (optional)"
+        required: false
+        default: ""
   schedule:
     # 2 facts (DustMust) + 2 money (Fun Honey) per day, auto-published, staggered
     # so no two publish at the same time (times are UTC; TR = UTC+3).
@@ -83,13 +87,17 @@ jobs:
           ID=${{ steps.runid.outputs.id }}
           MODE="${{ steps.cfg.outputs.mode }}"
           PRIV="${{ steps.cfg.outputs.privacy }}"
+          PUBAT="${{ inputs.publish_at }}"
           if [ "$MODE" = "facts" ]; then RT=YOUTUBE_REFRESH_TOKEN; else RT=YT_COMMENTS_REFRESH_TOKEN; fi
-          echo "mode=$MODE privacy=$PRIV token=$RT"
+          EXTRA=""
+          if [ -n "$PUBAT" ]; then EXTRA="--publish-at $PUBAT"; fi
+          echo "mode=$MODE privacy=$PRIV token=$RT publishAt=$PUBAT"
           python scripts/upload_youtube.py upload \
             --video out/$ID.mp4 \
             --meta run/$ID/meta.json \
             --privacy $PRIV \
             --refresh-token-env $RT \
+            $EXTRA \
             --out run/$ID/upload.json
           cat run/$ID/upload.json
       - name: Persist upload result + history
