@@ -14,3 +14,15 @@ test("pickTopic asks model avoiding recent topics and writes topic.json", async 
   const written = JSON.parse(fs.readFileSync(path.join(runRoot, "r1", "topic.json"), "utf8"));
   assert.strictEqual(written.topic, "Octopus hearts");
 });
+
+test("pickTopic with override skips the model and uses the given topic", async () => {
+  const runRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ovr-"));
+  let called = false;
+  const chat = async () => { called = true; return {}; };
+  const r = await pickTopic({ runId: "r1", runRoot, history: { entries: [] }, chat, override: "Why cats purr" });
+  assert.strictEqual(called, false);
+  assert.strictEqual(r.topic, "Why cats purr");
+  assert.strictEqual(r.slug, "why-cats-purr");
+  const w = JSON.parse(fs.readFileSync(path.join(runRoot, "r1", "topic.json"), "utf8"));
+  assert.strictEqual(w.topic, "Why cats purr");
+});
