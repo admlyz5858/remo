@@ -73,6 +73,86 @@
       "runId": "run-20260612-191139",
       "video_id": "5E4-lWFUS3U",
       "url": "https://youtu.be/5E4-lWFUS3U"
+    },
+    {
+      "mode": "facts",
+      "slug": "sloths",
+      "topic": "Sloths",
+      "status": "scheduled",
+      "runId": "run-20260613-090941",
+      "video_id": "XpIV_YYMZN0",
+      "url": "https://youtu.be/XpIV_YYMZN0",
+      "publish_at": "2026-06-14T09:00:00Z"
+    },
+    {
+      "mode": "facts",
+      "slug": "narwhals",
+      "topic": "Narwhals",
+      "status": "scheduled",
+      "runId": "run-20260613-090941",
+      "video_id": "1ZO4DtSgAZo",
+      "url": "https://youtu.be/1ZO4DtSgAZo",
+      "publish_at": "2026-06-14T15:00:00Z"
+    },
+    {
+      "mode": "facts",
+      "slug": "glass-frogs",
+      "topic": "Glass Frogs",
+      "status": "scheduled",
+      "runId": "run-20260613-090959",
+      "video_id": "MuwcHP6pKNg",
+      "url": "https://youtu.be/MuwcHP6pKNg",
+      "publish_at": "2026-06-15T09:00:00Z"
+    },
+    {
+      "mode": "facts",
+      "slug": "sloths",
+      "topic": "Sloths",
+      "status": "scheduled",
+      "runId": "run-20260613-091000",
+      "video_id": "QqWwFd06roA",
+      "url": "https://youtu.be/QqWwFd06roA",
+      "publish_at": "2026-06-15T15:00:00Z"
+    },
+    {
+      "mode": "money",
+      "slug": "the-psychology-of-impulse-buys",
+      "topic": "The Psychology of Impulse Buys",
+      "status": "scheduled",
+      "runId": "run-20260613-091014",
+      "video_id": "5p9j5fyVuLY",
+      "url": "https://youtu.be/5p9j5fyVuLY",
+      "publish_at": "2026-06-14T11:00:00Z"
+    },
+    {
+      "mode": "money",
+      "slug": "the-psychology-of-pricing",
+      "topic": "The Psychology of Pricing",
+      "status": "scheduled",
+      "runId": "run-20260613-091004",
+      "video_id": "QmQiyYPgPX0",
+      "url": "https://youtu.be/QmQiyYPgPX0",
+      "publish_at": "2026-06-14T17:00:00Z"
+    },
+    {
+      "mode": "money",
+      "slug": "the-psychology-of-discounts-why-50-off-tricks-your-brain",
+      "topic": "The Psychology of Discounts: Why '50% Off' Tricks Your Brain",
+      "status": "scheduled",
+      "runId": "run-20260613-091018",
+      "video_id": "UXOz5sYEsfI",
+      "url": "https://youtu.be/UXOz5sYEsfI",
+      "publish_at": "2026-06-15T11:00:00Z"
+    },
+    {
+      "mode": "money",
+      "slug": "the-anchoring-effect-in-spending",
+      "topic": "The Anchoring Effect in Spending",
+      "status": "scheduled",
+      "runId": "run-20260613-091010",
+      "video_id": "ILRzREsiIPo",
+      "url": "https://youtu.be/ILRzREsiIPo",
+      "publish_at": "2026-06-15T17:00:00Z"
     }
   ]
 }
