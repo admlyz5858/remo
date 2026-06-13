@@ -162,6 +162,40 @@
       "video_id": "JMJnU9-Mjas",
       "url": "https://youtu.be/JMJnU9-Mjas",
       "publish_at": "2026-06-15T15:00:00Z"
+    },
+    {
+      "slug": "sea-cucumbers-defense-mechanism",
+      "topic": "Sea Cucumbers",
+      "status": "published",
+      "runId": "run-20260613-112014",
+      "video_id": "nQSwEx0iMWE",
+      "url": "https://youtu.be/nQSwEx0iMWE"
+    },
+    {
+      "mode": "money",
+      "slug": "psychology-of-subscription-services",
+      "topic": "The Psychology of Subscription Services",
+      "status": "published",
+      "runId": "run-20260613-122335",
+      "video_id": "52oLd5ptMe8",
+      "url": "https://youtu.be/52oLd5ptMe8"
+    },
+    {
+      "slug": "peacock-spiders-tiny-dancers",
+      "topic": "Peacock Spiders",
+      "status": "published",
+      "runId": "run-20260613-161100",
+      "video_id": "4hNG3GKb91w",
+      "url": "https://youtu.be/4hNG3GKb91w"
+    },
+    {
+      "mode": "money",
+      "slug": "psychology-of-sunk-costs",
+      "topic": "The Psychology of Sunk Costs",
+      "status": "published",
+      "runId": "run-20260613-181453",
+      "video_id": "d3qmDQUF8XQ",
+      "url": "https://youtu.be/d3qmDQUF8XQ"
     }
   ]
 }
