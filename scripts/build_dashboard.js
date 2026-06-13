@@ -5,7 +5,7 @@ function todayKey(iso) {
 function buildDashboard(history, statsById, channels, nowIso) {
   const tk = todayKey(nowIso);
   const videos = (history.entries || [])
-    .filter((e) => e.video_id)
+    .filter((e) => e.video_id && e.status !== "rejected")
     .map((e) => {
       const st = statsById[e.video_id] || {};
       return {

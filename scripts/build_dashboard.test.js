@@ -12,6 +12,7 @@ test("buildDashboard maps videos, stats, thumbnails, metrics", () => {
     { video_id: "a", url: "u/a", mode: "facts", topic: "Sloths", status: "scheduled", publish_at: "2026-06-14T09:00:00Z", runId: "run-20260613-101010" },
     { video_id: "b", url: "u/b", mode: "money", topic: "Pricing", status: "published", runId: "run-20260612-101010" },
     { slug: "no-video-yet", status: "pending" },
+    { video_id: "c", mode: "facts", topic: "Old", status: "rejected", runId: "run-20260611-101010" },
   ]};
   const stats = { b: { views: 1000, likes: 50 } };
   const d = buildDashboard(history, stats, channels, "2026-06-13T12:00:00Z");
