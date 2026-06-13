@@ -103,7 +103,7 @@ jobs:
       - name: Persist upload result + history
         run: |
           ID=${{ steps.runid.outputs.id }}
-          node -e "const fs=require('fs');const u=require('./run/'+process.env.ID+'/upload.json');const h=require('./state/history.json');const e=h.entries.find(x=>x.runId===process.env.ID);if(e){e.video_id=u.video_id;e.url=u.url;if(u.privacy==='public')e.status='published';}fs.writeFileSync('state/history.json',JSON.stringify(h,null,2));"
+          node -e "const fs=require('fs');const u=require('./run/'+process.env.ID+'/upload.json');const h=require('./state/history.json');const e=h.entries.find(x=>x.runId===process.env.ID);if(e){e.video_id=u.video_id;e.url=u.url;if(u.publish_at){e.status='scheduled';e.publish_at=u.publish_at;}else if(u.privacy==='public'){e.status='published';}}fs.writeFileSync('state/history.json',JSON.stringify(h,null,2));"
         env: { ID: "${{ steps.runid.outputs.id }}" }
       - name: Commit state
         run: |

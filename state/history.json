@@ -157,10 +157,11 @@
     {
       "slug": "bioluminescent-fungi-natures-nightlights",
       "topic": "Bioluminescent Fungi",
-      "status": "pending",
+      "status": "scheduled",
       "runId": "run-20260613-105716",
       "video_id": "JMJnU9-Mjas",
-      "url": "https://youtu.be/JMJnU9-Mjas"
+      "url": "https://youtu.be/JMJnU9-Mjas",
+      "publish_at": "2026-06-15T15:00:00Z"
     }
   ]
 }
