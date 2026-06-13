@@ -60,7 +60,7 @@ async function main() {
     const { findMediaCandidates } = require("./lib/stock");
     let topic;
     for (let attempt = 0; attempt < 3; attempt++) {
-      topic = await pickMoneyTopic({ runId, runRoot, history, chat });
+      topic = await pickMoneyTopic({ runId, runRoot, history, chat, override: process.env.TOPIC });
       if (!isDuplicate(history, topic.slug)) break;
     }
     await writeMoneyScript({ runId, runRoot, topic, chat });
@@ -84,7 +84,7 @@ async function main() {
 
   let topic;
   for (let attempt = 0; attempt < 3; attempt++) {
-    topic = await pickTopic({ runId, runRoot, history, chat });
+    topic = await pickTopic({ runId, runRoot, history, chat, override: process.env.TOPIC });
     if (!isDuplicate(history, topic.slug)) break;
     console.log("duplicate topic, retrying:", topic.slug);
   }

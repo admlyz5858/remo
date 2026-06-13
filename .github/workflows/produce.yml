@@ -14,6 +14,10 @@ on:
         description: "RFC3339 time to auto-publish, e.g. 2026-06-14T09:00:00Z (optional)"
         required: false
         default: ""
+      topic:
+        description: "optional exact topic (blank = auto)"
+        required: false
+        default: ""
   schedule:
     # 2 facts (DustMust) + 2 money (Fun Honey) per day, auto-published, staggered
     # so no two publish at the same time (times are UTC; TR = UTC+3).
@@ -68,6 +72,7 @@ jobs:
           MODE: ${{ steps.cfg.outputs.mode }}
           REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          TOPIC: ${{ inputs.topic }}
         run: node pipeline/run.js
       - name: Capture run id
         id: runid
