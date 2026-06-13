@@ -22,5 +22,6 @@ test("pickMoneyTopic without override asks the model avoiding recent topics", as
   const fakeChat = async ({ messages }) => { seenMessages = messages; return { topic: "Scarcity mindset", angle: "psychology", why_interesting: "drives overspending", slug: "scarcity-mindset" }; };
   const result = await pickMoneyTopic({ runId: "r1", runRoot, history, chat: fakeChat });
   assert.match(JSON.stringify(seenMessages), /50\/30\/20 rule/);
+  assert.match(JSON.stringify(seenMessages), /money|finance/i);
   assert.strictEqual(result.slug, "scarcity-mindset");
 });
