@@ -196,6 +196,16 @@
       "runId": "run-20260613-181453",
       "video_id": "d3qmDQUF8XQ",
       "url": "https://youtu.be/d3qmDQUF8XQ"
+    },
+    {
+      "mode": "money",
+      "slug": "how-fear-and-greed-drive-financial-decisions",
+      "topic": "Money and Emotions",
+      "status": "scheduled",
+      "runId": "run-20260614-112737",
+      "video_id": "VNCD26uQRm0",
+      "url": "https://youtu.be/VNCD26uQRm0",
+      "publish_at": "2026-06-16T11:00:00.000Z"
     }
   ]
 }
