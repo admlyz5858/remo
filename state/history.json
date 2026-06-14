@@ -206,6 +206,16 @@
       "video_id": "VNCD26uQRm0",
       "url": "https://youtu.be/VNCD26uQRm0",
       "publish_at": "2026-06-16T11:00:00.000Z"
+    },
+    {
+      "mode": "money",
+      "slug": "psychology-of-free-offers",
+      "topic": "The Psychology of 'Free'",
+      "status": "scheduled",
+      "runId": "run-20260614-113655",
+      "video_id": "RgamgFxTqyQ",
+      "url": "https://youtu.be/RgamgFxTqyQ",
+      "publish_at": "2026-06-16T17:00:00.000Z"
     }
   ]
 }
