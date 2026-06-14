@@ -216,6 +216,15 @@
       "video_id": "RgamgFxTqyQ",
       "url": "https://youtu.be/RgamgFxTqyQ",
       "publish_at": "2026-06-16T17:00:00.000Z"
+    },
+    {
+      "mode": "money",
+      "slug": "psychology-financial-windfalls",
+      "topic": "The Psychology of Financial Windfalls",
+      "status": "published",
+      "runId": "run-20260614-130027",
+      "video_id": "HPAgjrc8NTU",
+      "url": "https://youtu.be/HPAgjrc8NTU"
     }
   ]
 }
