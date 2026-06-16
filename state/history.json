@@ -293,6 +293,16 @@
       "runId": "run-20260616-155159",
       "video_id": "-85xl78uE58",
       "url": "https://youtu.be/-85xl78uE58"
+    },
+    {
+      "mode": "money",
+      "slug": "psychology-of-buy-now-pay-later",
+      "topic": "The Psychology of 'Buy Now, Pay Later'",
+      "status": "scheduled",
+      "runId": "run-20260616-173154",
+      "video_id": "WZgqDJQ9oGU",
+      "url": "https://youtu.be/WZgqDJQ9oGU",
+      "publish_at": "2026-06-17T11:00:00.000Z"
     }
   ]
 }
