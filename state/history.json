@@ -320,6 +320,16 @@
       "runId": "run-20260616-201511",
       "video_id": "TcqT-_NQgxk",
       "url": "https://youtu.be/TcqT-_NQgxk"
+    },
+    {
+      "mode": "money",
+      "slug": "the-psychology-of-money-regret",
+      "topic": "The Psychology of Money Regret",
+      "status": "scheduled",
+      "runId": "run-20260616-210059",
+      "video_id": "QWAf8kCtC94",
+      "url": "https://youtu.be/QWAf8kCtC94",
+      "publish_at": "2026-06-18T11:00:00Z"
     }
   ]
 }
