@@ -330,6 +330,16 @@
       "video_id": "QWAf8kCtC94",
       "url": "https://youtu.be/QWAf8kCtC94",
       "publish_at": "2026-06-18T11:00:00Z"
+    },
+    {
+      "mode": "money",
+      "slug": "psychology-small-wins-saving-money",
+      "topic": "The Psychology of 'Small Wins' in Saving Money",
+      "status": "scheduled",
+      "runId": "run-20260617-112830",
+      "video_id": "enCKJRYW5F0",
+      "url": "https://youtu.be/enCKJRYW5F0",
+      "publish_at": "2026-06-18T17:00:00.000Z"
     }
   ]
 }
