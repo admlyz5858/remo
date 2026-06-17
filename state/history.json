@@ -340,6 +340,14 @@
       "video_id": "enCKJRYW5F0",
       "url": "https://youtu.be/enCKJRYW5F0",
       "publish_at": "2026-06-18T17:00:00.000Z"
+    },
+    {
+      "slug": "the-pistol-shrimp",
+      "topic": "The Pistol Shrimp",
+      "status": "published",
+      "runId": "run-20260617-125533",
+      "video_id": "hcNrlEKeESU",
+      "url": "https://youtu.be/hcNrlEKeESU"
     }
   ]
 }
