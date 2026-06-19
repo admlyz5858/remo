@@ -1,7 +1,7 @@
-const SLOTS = { facts: [9, 15], money: [11, 17] }; // UTC hours, staggered
+const SLOTS = { facts: [9], money: [11] }; // UTC hours, one slot/day per channel, staggered
 
 function nextSlotIso(videos, mode, nowMs) {
-  const slots = SLOTS[mode] || [9, 15];
+  const slots = SLOTS[mode] || [9];
   const sched = (videos || [])
     .filter((v) => v.mode === mode && v.publish_at)
     .map((v) => Date.parse(v.publish_at))
