@@ -19,10 +19,11 @@ on:
         required: false
         default: ""
   schedule:
-    # 1 facts (DustMust) + 1 money (Fun Honey) per day, auto-published, staggered
-    # so no two publish at the same time (times are UTC; TR = UTC+3).
-    - cron: "0 9 * * *"    # facts (DustMust)  12:00 Türkiye
-    - cron: "0 11 * * *"   # money (Fun Honey) 14:00 Türkiye
+    # Both channels (DustMust + Fun Honey) auto-produce + publish PUBLIC twice a
+    # day, at 12:00 and 18:00 Türkiye time (UTC = TR-3). Each cron fans out to
+    # both modes via the job matrix below.
+    - cron: "0 9 * * *"    # 12:00 Türkiye — facts + money
+    - cron: "0 15 * * *"   # 18:00 Türkiye — facts + money
 
 permissions:
   contents: write
@@ -30,6 +31,13 @@ permissions:
 jobs:
   produce:
     runs-on: ubuntu-latest
+    # On schedule, fan out to both channels; manual runs use the single input mode.
+    # max-parallel: 1 serializes the matrix so the two jobs never race on the
+    # state/history.json commit+push.
+    strategy:
+      max-parallel: 1
+      matrix:
+        mode: ${{ fromJSON(github.event_name == 'schedule' && '["facts","money"]' || format('["{0}"]', inputs.mode || 'facts')) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,14 +55,10 @@ jobs:
       - name: Resolve mode + privacy
         id: cfg
         run: |
+          M="${{ matrix.mode }}"
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            case "${{ github.event.schedule }}" in
-              "0 11 * * *") M=money ;;
-              *) M=facts ;;
-            esac
             P=public
           else
-            M="${{ inputs.mode || 'facts' }}"
             P="${{ inputs.privacy || 'private' }}"
           fi
           echo "mode=$M" >> "$GITHUB_OUTPUT"
@@ -109,9 +113,21 @@ jobs:
           node -e "const fs=require('fs');const u=require('./run/'+process.env.ID+'/upload.json');const h=require('./state/history.json');const e=h.entries.find(x=>x.runId===process.env.ID);if(e){e.video_id=u.video_id;e.url=u.url;if(u.publish_at){e.status='scheduled';e.publish_at=u.publish_at;}else if(u.privacy==='public'){e.status='published';}}fs.writeFileSync('state/history.json',JSON.stringify(h,null,2));"
         env: { ID: "${{ steps.runid.outputs.id }}" }
       - name: Commit state
+        env: { ID: "${{ steps.runid.outputs.id }}" }
         run: |
           git config user.name "remo-bot"
           git config user.email "bot@remo"
-          git add state/history.json run/${{ steps.runid.outputs.id }}/upload.json || true
-          git commit -m "run ${{ steps.runid.outputs.id }} uploaded (private)" || echo "nothing to commit"
-          git push || echo "push skipped"
+          # Snapshot this run's complete history entry (topic/slug/mode/video_id/...)
+          # outside the repo so it survives the reset --hard in the retry loop.
+          node -e "const fs=require('fs');const h=require('./state/history.json');const e=h.entries.find(x=>x.runId===process.env.ID);if(!e)process.exit(0);fs.writeFileSync(process.env.RUNNER_TEMP+'/entry.json',JSON.stringify(e));"
+          [ -f "$RUNNER_TEMP/entry.json" ] || { echo "no entry to commit"; exit 0; }
+          # Re-apply onto the freshest remote each try → survives parallel push races.
+          for i in 1 2 3 4 5; do
+            git fetch origin master -q
+            git reset --hard origin/master -q
+            node -e "const fs=require('fs');const h=require('./state/history.json');const e=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/entry.json','utf8'));const k=h.entries.findIndex(x=>x.runId===e.runId);if(k>=0)h.entries[k]=e;else h.entries.push(e);fs.writeFileSync('state/history.json',JSON.stringify(h,null,2));"
+            git add state/history.json
+            git commit -m "run $ID uploaded" -q || { echo "nothing to commit"; break; }
+            if git push -q 2>/dev/null; then echo "pushed on try $i"; break; fi
+            echo "push race; retry $i"; sleep $((RANDOM % 5 + 3))
+          done
