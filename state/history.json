@@ -464,6 +464,15 @@
       "video_id": "PPch4domx7I",
       "url": "https://youtu.be/PPch4domx7I",
       "publish_at": "2026-06-21T10:00:00Z"
+    },
+    {
+      "slug": "why-flamingos-stand-on-one-leg",
+      "topic": "Flamingos",
+      "status": "scheduled",
+      "runId": "run-20260620-205835",
+      "video_id": "jdlCi8MfZDw",
+      "url": "https://youtu.be/jdlCi8MfZDw",
+      "publish_at": "2026-06-21T09:00:00Z"
     }
   ]
 }
