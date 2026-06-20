@@ -19,11 +19,12 @@ on:
         required: false
         default: ""
   schedule:
-    # Both channels (DustMust + Fun Honey) auto-produce + publish PUBLIC twice a
-    # day, at 12:00 and 18:00 Türkiye time (UTC = TR-3). Each cron fans out to
-    # both modes via the job matrix below.
-    - cron: "0 9 * * *"    # 12:00 Türkiye — facts + money
-    - cron: "0 15 * * *"   # 18:00 Türkiye — facts + money
+    # Both channels auto-produce + publish PUBLIC twice a day, STAGGERED by 1h so
+    # no two videos ever publish at the same time (UTC = TR-3).
+    - cron: "0 9 * * *"    # facts (DustMust)  12:00 Türkiye
+    - cron: "0 10 * * *"   # money (Fun Honey) 13:00 Türkiye
+    - cron: "0 15 * * *"   # facts (DustMust)  18:00 Türkiye
+    - cron: "0 16 * * *"   # money (Fun Honey) 19:00 Türkiye
 
 permissions:
   contents: write
@@ -31,13 +32,6 @@ permissions:
 jobs:
   produce:
     runs-on: ubuntu-latest
-    # On schedule, fan out to both channels; manual runs use the single input mode.
-    # max-parallel: 1 serializes the matrix so the two jobs never race on the
-    # state/history.json commit+push.
-    strategy:
-      max-parallel: 1
-      matrix:
-        mode: ${{ fromJSON(github.event_name == 'schedule' && '["facts","money"]' || format('["{0}"]', inputs.mode || 'facts')) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -55,10 +49,14 @@ jobs:
       - name: Resolve mode + privacy
         id: cfg
         run: |
-          M="${{ matrix.mode }}"
           if [ "${{ github.event_name }}" = "schedule" ]; then
+            case "${{ github.event.schedule }}" in
+              "0 10 * * *"|"0 16 * * *") M=money ;;
+              *) M=facts ;;
+            esac
             P=public
           else
+            M="${{ inputs.mode || 'facts' }}"
             P="${{ inputs.privacy || 'private' }}"
           fi
           echo "mode=$M" >> "$GITHUB_OUTPUT"
