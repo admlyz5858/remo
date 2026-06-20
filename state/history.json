@@ -454,6 +454,16 @@
       "runId": "run-20260620-162421",
       "video_id": "nELU0MXj4n8",
       "url": "https://youtu.be/nELU0MXj4n8"
+    },
+    {
+      "mode": "money",
+      "slug": "zeigarnik-effect-unpaid-bills",
+      "topic": "The Zeigarnik Effect and Unpaid Bills",
+      "status": "scheduled",
+      "runId": "run-20260620-205829",
+      "video_id": "PPch4domx7I",
+      "url": "https://youtu.be/PPch4domx7I",
+      "publish_at": "2026-06-21T10:00:00Z"
     }
   ]
 }
