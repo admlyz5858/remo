@@ -19,12 +19,11 @@ on:
         required: false
         default: ""
   schedule:
-    # Both channels auto-produce + publish PUBLIC twice a day, STAGGERED by 1h so
-    # no two videos ever publish at the same time (UTC = TR-3).
+    # Ongoing auto-production: 1 facts + 1 money per day (max 2/day), STAGGERED so
+    # no two videos ever publish at the same time (UTC = TR-3). The 15:00/16:00
+    # slots are left free for manually-scheduled batches.
     - cron: "0 9 * * *"    # facts (DustMust)  12:00 Türkiye
     - cron: "0 10 * * *"   # money (Fun Honey) 13:00 Türkiye
-    - cron: "0 15 * * *"   # facts (DustMust)  18:00 Türkiye
-    - cron: "0 16 * * *"   # money (Fun Honey) 19:00 Türkiye
 
 permissions:
   contents: write
@@ -51,7 +50,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
             case "${{ github.event.schedule }}" in
-              "0 10 * * *"|"0 16 * * *") M=money ;;
+              "0 10 * * *") M=money ;;
               *) M=facts ;;
             esac
             P=public
