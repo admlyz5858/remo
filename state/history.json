@@ -545,6 +545,16 @@
       "video_id": "le3fDMNgiCs",
       "url": "https://youtu.be/le3fDMNgiCs",
       "publish_at": "2026-06-30T13:00:00Z"
+    },
+    {
+      "mode": "money",
+      "slug": "the-psychology-of-the-snowball-effect-in-debt-payoff",
+      "topic": "The Psychology of 'The Snowball Effect' in Debt Payoff",
+      "status": "scheduled",
+      "runId": "run-20260629-214657",
+      "video_id": "pMY_v-QZIMo",
+      "url": "https://youtu.be/pMY_v-QZIMo",
+      "publish_at": "2026-07-02T18:00:00Z"
     }
   ]
 }
