@@ -536,6 +536,15 @@
       "video_id": "JDzhKdnDxDg",
       "url": "https://youtu.be/JDzhKdnDxDg",
       "publish_at": "2026-07-02T15:00:00Z"
+    },
+    {
+      "slug": "the-immortal-planarian-worm",
+      "topic": "The Immortal Planarian Worm",
+      "status": "scheduled",
+      "runId": "run-20260629-214617",
+      "video_id": "le3fDMNgiCs",
+      "url": "https://youtu.be/le3fDMNgiCs",
+      "publish_at": "2026-06-30T13:00:00Z"
     }
   ]
 }
