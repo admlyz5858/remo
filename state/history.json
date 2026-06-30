@@ -507,6 +507,63 @@
       "runId": "run-20260621-174623",
       "video_id": "JDlcgZ1_F8g",
       "url": "https://youtu.be/JDlcgZ1_F8g"
+    },
+    {
+      "mode": "money",
+      "slug": "the-psychology-of-the-1-percent-rule",
+      "topic": "The Psychology of 'The 1% Rule' in Wealth Building",
+      "status": "scheduled",
+      "runId": "run-20260629-214620",
+      "video_id": "NdD3YUk5bIM",
+      "url": "https://youtu.be/NdD3YUk5bIM",
+      "publish_at": "2026-06-30T16:00:00Z"
+    },
+    {
+      "mode": "money",
+      "slug": "the-threshold-effect-in-saving-money",
+      "topic": "The Psychology of 'The Threshold Effect' in Saving Money",
+      "status": "scheduled",
+      "runId": "run-20260629-214640",
+      "video_id": "WV_03kLInrA",
+      "url": "https://youtu.be/WV_03kLInrA",
+      "publish_at": "2026-07-01T17:00:00Z"
+    },
+    {
+      "slug": "the-immortal-snail-thought-experiment",
+      "topic": "The Immortal Snail",
+      "status": "scheduled",
+      "runId": "run-20260629-214649",
+      "video_id": "JDzhKdnDxDg",
+      "url": "https://youtu.be/JDzhKdnDxDg",
+      "publish_at": "2026-07-02T15:00:00Z"
+    },
+    {
+      "slug": "the-immortal-planarian-worm",
+      "topic": "The Immortal Planarian Worm",
+      "status": "scheduled",
+      "runId": "run-20260629-214617",
+      "video_id": "le3fDMNgiCs",
+      "url": "https://youtu.be/le3fDMNgiCs",
+      "publish_at": "2026-06-30T13:00:00Z"
+    },
+    {
+      "mode": "money",
+      "slug": "the-psychology-of-the-snowball-effect-in-debt-payoff",
+      "topic": "The Psychology of 'The Snowball Effect' in Debt Payoff",
+      "status": "scheduled",
+      "runId": "run-20260629-214657",
+      "video_id": "pMY_v-QZIMo",
+      "url": "https://youtu.be/pMY_v-QZIMo",
+      "publish_at": "2026-07-02T18:00:00Z"
+    },
+    {
+      "slug": "glasswing-butterflies-natures-invisible-insects",
+      "topic": "Glasswing Butterflies",
+      "status": "scheduled",
+      "runId": "run-20260629-214627",
+      "video_id": "aIEIcsHnZJA",
+      "url": "https://youtu.be/aIEIcsHnZJA",
+      "publish_at": "2026-07-01T14:00:00Z"
     }
   ]
 }
