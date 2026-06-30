@@ -19,11 +19,10 @@ on:
         required: false
         default: ""
   schedule:
-    # Ongoing auto-production: 1 facts + 1 money per day (max 2/day), STAGGERED so
-    # no two videos ever publish at the same time (UTC = TR-3). The 15:00/16:00
-    # slots are left free for manually-scheduled batches.
-    - cron: "0 9 * * *"    # facts (DustMust)  12:00 Türkiye
-    - cron: "0 10 * * *"   # money (Fun Honey) 13:00 Türkiye
+    # Exactly 1 video per day, alternating channels by day-of-month parity
+    # (odd day → facts/DustMust, even day → money/Fun Honey). One upload/day,
+    # well under YouTube's daily quota. Publishes public at 09:00 UTC (12:00 TR).
+    - cron: "0 9 * * *"
 
 permissions:
   contents: write
@@ -49,10 +48,9 @@ jobs:
         id: cfg
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            case "${{ github.event.schedule }}" in
-              "0 10 * * *") M=money ;;
-              *) M=facts ;;
-            esac
+            # Alternate channels by day-of-month parity: odd → facts, even → money.
+            D=$(date -u +%d)
+            if [ $((10#$D % 2)) -eq 0 ]; then M=money; else M=facts; fi
             P=public
           else
             M="${{ inputs.mode || 'facts' }}"
